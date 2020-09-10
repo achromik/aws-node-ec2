@@ -1,7 +1,11 @@
 const express = require('express');
 const app = express();
-const port = 3000;
 
-app.get('/status', (req, res) => res.send({ status: "I'm alive" }));
+const { log } = require('./config/logger');
+const { connectDB } = require('./config/db');
 
-app.listen(port, () => console.log(`Listening on port ${port}!`));
+const port = process.env.PORT || 3000;
+
+// connectDB();
+
+app.listen(port, () => log.info(`Listening on port ${port}!`));
