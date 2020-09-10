@@ -1,2 +1,2 @@
 #!/bin/sh
-node index.js | bunyan -o short
+node src/index.js | bunyan -o short

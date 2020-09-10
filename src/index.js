@@ -6,6 +6,6 @@ const { connectDB } = require('./config/db');
 
 const port = process.env.PORT || 3000;
 
-// connectDB();
+connectDB();
 
 app.listen(port, () => log.info(`Listening on port ${port}!`));
