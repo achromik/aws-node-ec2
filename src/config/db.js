@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const { log } = require('./logger');
+const AppLogger = require('./logger');
 
 const db = process.env.DB;
 let dbInstance = null;
@@ -11,7 +11,8 @@ exports.connectDB = async () => {
   }
 
   if (dbInstance) {
-    log.info('Using existing database connection');
+    AppLogger.log.info('Using existing database connection');
+
     return Promise.resolve(dbInstance);
   }
 
@@ -21,11 +22,13 @@ exports.connectDB = async () => {
       useUnifiedTopology: true,
       useFindAndModify: false,
     });
-    log.info('MongoDB connected...');
+    AppLogger.log.info('MongoDB connected...');
+
     dbInstance = mongoose.connection;
     return Promise.resolve(dbInstance);
   } catch (err) {
-    log.error(err.message);
+    AppLogger.log.error(err.message);
+
     throw new Error(err.message);
   }
 };
