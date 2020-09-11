@@ -16,6 +16,7 @@
     "bunyan-express-serializer": "^1.0.0",
     "express": "^4.17.1",
     "express-request-id": "^1.4.1",
+    "joi": "^17.2.1",
     "jsonwebtoken": "^8.5.1",
     "mockgoose": "^8.0.4",
     "mongoose": "^5.10.4"

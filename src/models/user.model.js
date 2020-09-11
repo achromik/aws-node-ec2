@@ -5,8 +5,14 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  email: String,
-  password: String,
+  email: {
+    type: String,
+    required: true,
+  },
+  password: {
+    type: String,
+    required: true,
+  },
   roles: [
     {
       type: mongoose.Schema.Types.ObjectId,

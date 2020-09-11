@@ -1,4 +1,5 @@
 const bunyan = require('bunyan');
+const { common } = require('./constants');
 
 const log = bunyan.createLogger({
   name: 'ec2-app',
@@ -22,7 +23,7 @@ const logResponse = function (id, body, statusCode) {
     },
     true
   );
-  log.info('response');
+  log.info(common.RESPONSE);
 };
 
 const logRequest = function (req) {
@@ -36,7 +37,7 @@ const logRequest = function (req) {
     },
     true
   );
-  log.info('request');
+  log.info(common.REQUEST);
 };
 
 module.exports = { log, logRequest, logResponse };
