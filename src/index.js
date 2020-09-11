@@ -4,13 +4,19 @@ const addRequestId = require('express-request-id')();
 
 const AppLogger = require('./config/logger');
 const { connectDB } = require('./config/db');
+const db = require('./models');
+const seedRoles = require('./config/seedRoles');
+
+const Role = db.role;
 
 const port = process.env.PORT || 3000;
 
-connectDB();
+connectDB().then(() => {
+  seedRoles();
+});
 
 app.use(express.json());
-app.use(express.urlencoded());
+app.use(express.urlencoded({ extended: true }));
 app.use(addRequestId);
 
 app.use((req, res, next) => {
@@ -38,8 +44,8 @@ app.use((req, res, next) => {
   next();
 });
 
-app.get('/status', (req, res, next) => {
-  res.send('Welcome');
+app.get('/', (req, res, next) => {
+  res.json({ message: 'Welcome' });
 });
 
 app.post('/status', (req, res, next) => {
