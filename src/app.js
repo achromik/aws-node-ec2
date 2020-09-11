@@ -4,6 +4,9 @@ const addRequestId = require('express-request-id')();
 
 const AppLogger = require('./config/logger');
 
+const db = require('./models');
+const User = db.user;
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(addRequestId);
@@ -37,8 +40,16 @@ app.get('/', (req, res, next) => {
   res.json({ message: 'Welcome' });
 });
 
-app.post('/status', (req, res, next) => {
-  res.send({ data: req.body });
+app.post('/user', async (req, res, next) => {
+  const body = req.body;
+  try {
+    const user = new User(body);
+    const result = await user.save({ body });
+    res.send({ data: result });
+  } catch (err) {
+    AppLogger.log.error({ err }, 'Saving user failed');
+    res.status(400).send(err);
+  }
 });
 
 app.use((req, res, next) => {

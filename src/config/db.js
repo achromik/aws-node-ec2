@@ -6,6 +6,22 @@ const db = process.env.DB;
 let dbInstance = null;
 
 exports.connectDB = async () => {
+  if (process.env.NODE_ENV === 'test') {
+    const Mockgoose = require('mockgoose').Mockgoose;
+    const mockgoose = new Mockgoose(mongoose);
+    try {
+      await mockgoose.prepareStorage();
+      const mockDBInstance = await mongoose.connect(db, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        useFindAndModify: false,
+      });
+      return Promise.resolve(dbInstance);
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  }
+
   if (!db) {
     throw new Error('Missing database uri in .env file');
   }
@@ -31,4 +47,8 @@ exports.connectDB = async () => {
 
     throw new Error(err.message);
   }
+};
+
+exports.close = () => {
+  return mongoose.disconnect();
 };
