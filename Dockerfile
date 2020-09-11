@@ -8,7 +8,7 @@ RUN npm install -g bunyan
 
 COPY package*.json ./
 
-RUN npm install && npm cache clean --force
+RUN npm install --production  && npm cache clean --force
 
 COPY . .
 
