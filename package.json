@@ -2,11 +2,11 @@
   "name": "ec2",
   "version": "1.0.1",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/index.js | bunyan -o short",
-    "dev": "nodemon -r dotenv/config src/index.js | bunyan -o short"
+    "start": "node src/server.js | bunyan -o short",
+    "dev": "nodemon -r dotenv/config src/server.js | bunyan -o short"
   },
   "author": "",
   "license": "ISC",
