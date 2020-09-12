@@ -1,5 +1,6 @@
 const { middleware, common } = require('../config/constants');
 const AppLogger = require('../config/logger');
+const { ROLES } = require('../models');
 const db = require('../models');
 
 const ROLE = db.ROLES;
@@ -17,9 +18,12 @@ const checkDuplicateUsernameOrEmail = async (req, res, next) => {
         middleware.verifySignUp.USERNAME_EXISTS
       );
 
-      res
-        .status(400)
-        .send({ message: middleware.verifySignUp.USERNAME_EXISTS });
+      res.status(400).send({
+        error: {
+          statusCode: 400,
+          message: middleware.verifySignUp.USERNAME_EXISTS,
+        },
+      });
       return;
     }
 
@@ -33,7 +37,14 @@ const checkDuplicateUsernameOrEmail = async (req, res, next) => {
         middleware.verifySignUp.EMAIL_EXISTS
       );
 
-      res.status(400).send({ message: middleware.verifySignUp.EMAIL_EXISTS });
+      res
+        .status(400)
+        .send({
+          error: {
+            statusCode: 400,
+            message: middleware.verifySignUp.EMAIL_EXISTS,
+          },
+        });
       return;
     }
 
@@ -44,9 +55,39 @@ const checkDuplicateUsernameOrEmail = async (req, res, next) => {
       middleware.verifySignUp.VERIFY_SIGNUP_MIDDLEWARE
     );
 
-    res.status(500).send({ message: err.message || common.UNKNOWN_ERROR });
+    res
+      .status(500)
+      .send({
+        error: {
+          statusCode: 400,
+          message: err.message || common.UNKNOWN_ERROR,
+        },
+      });
     return;
   }
 };
 
-module.exports = { checkDuplicateUsernameOrEmail };
+const checkRoleExisted = (req, res, next) => {
+  if (req.body.roles) {
+    const nonExistentRoles = req.body.roles.filter(
+      (role) => !ROLES.includes(role)
+    );
+
+    if (nonExistentRoles.length) {
+      res
+        .status(400)
+        .send({
+          error: {
+            statusCode: 400,
+            message: `${middleware.verifySignUp.NON_EXISTENT_ROLE}${
+              nonExistentRoles.length > 1 ? 's' : ''
+            }: ${nonExistentRoles.join(', ')}`,
+          },
+        });
+      return null;
+    }
+  }
+  next();
+};
+
+module.exports = { checkDuplicateUsernameOrEmail, checkRoleExisted };

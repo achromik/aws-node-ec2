@@ -7,9 +7,9 @@ const { signupSchema } = require('../schemas/auth.schema');
 const validateRequest = require('../util/validateRequest');
 const validationErrorDetailsToString = require('../util/validationErrorDetailsToString');
 
-const signup = async (req, res, next) => {
+const signup = (req, res, next) => {
   try {
-    const value = await validateRequest(req, signupSchema);
+    const value = validateRequest(req, signupSchema);
     req.body = value;
     next();
   } catch (err) {
@@ -17,14 +17,14 @@ const signup = async (req, res, next) => {
       common.VALIDATION_ERROR
     }: ${validationErrorDetailsToString(err.details)}`;
 
-    const body = {
-      status: 400,
-      error: message,
-    };
-
     AppLogger.log.warn({ err }, auth.SIGNUP_VALIDATOR);
 
-    res.status(400).send(body);
+    res.status(400).send({
+      error: {
+        statusCode: 400,
+        message,
+      },
+    });
   }
 };
 

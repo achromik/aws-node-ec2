@@ -9,8 +9,9 @@ const middleware = {
   verifySignUp: {
     VERIFY_SIGNUP_MIDDLEWARE: 'Verify Signup Middleware',
     CHECK_USER_OR_EMAIL: 'checkDuplicateUsernameOrEmail',
-    USERNAME_EXISTS: 'Failed! Username is already in use!',
-    EMAIL_EXISTS: 'Failed! Email is already in use!',
+    USERNAME_EXISTS: 'Failed! Username is already in use',
+    EMAIL_EXISTS: 'Failed! Email is already in use',
+    NON_EXISTENT_ROLE: 'Failed! Non existent role',
   },
 };
 

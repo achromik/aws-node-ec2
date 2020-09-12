@@ -45,10 +45,10 @@ authRoutes(app);
 userRoutes(app);
 
 app.use((req, res, next) => {
-  const response = { status: 404, error: common.NOT_FOUND };
+  const response = { statusCode: 404, message: common.NOT_FOUND };
   AppLogger.log.warn({ id: req.id, path: req.path }, common.NOT_FOUND);
 
-  res.status(404).send(response);
+  res.status(404).send({ error: response });
 });
 
 app.use((error, req, res, next) => {
