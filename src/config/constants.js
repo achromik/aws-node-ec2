@@ -23,4 +23,10 @@ const common = {
   REQUEST: 'Request',
 };
 
-module.exports = { auth, middleware, common };
+const userRole = {
+  USER: 'user',
+  MODERATOR: 'moderator',
+  ADMIN: 'admin',
+};
+
+module.exports = { auth, middleware, common, userRole };
