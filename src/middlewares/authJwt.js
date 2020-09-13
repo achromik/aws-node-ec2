@@ -27,19 +27,20 @@ exports.verifyToken = (req, res, next) => {
   });
 };
 
-exports.isAdmin = async (req, res, next) => {
+const hasRole = (roleName) => async (req, res, next) => {
   try {
     const user = await User.findById(req.userId);
 
     const roles = await Role.find({ _id: { $in: user.roles } });
 
-    const isAdmin = roles.some((role) => role.name === userRole.ADMIN);
-    if (isAdmin) {
+    const hasUserRole = roles.some((role) => role.name === roleName);
+
+    if (hasUserRole) {
       next();
       return true;
     }
 
-    responseWithError(403, middleware.authJwt.ADMIN_ROLE_REQUIRED)(res);
+    responseWithError(403, `${common.REQUIRED_ROLE}: ${roleName}`)(res);
     return false;
   } catch (err) {
     AppLogger.log.error({ err }, middleware.authJwt.AUTH_JWT_MIDDLEWARE);
@@ -48,3 +49,7 @@ exports.isAdmin = async (req, res, next) => {
     return false;
   }
 };
+
+exports.isAdmin = hasRole(userRole.ADMIN);
+exports.isModerator = hasRole(userRole.MODERATOR);
+exports.hasRole = hasRole;

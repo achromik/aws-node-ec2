@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 
 const responseWithError = require('../../src/util/responseWithError');
 const { authJwt } = require('../../src/middlewares');
-const { userRole, middleware } = require('../../src/config/constants');
+const { userRole, middleware, common } = require('../../src/config/constants');
 const authConfig = require('../../src/config/auth.config');
 
 const db = require('../../src/models');
@@ -36,6 +36,17 @@ const mockAdminRoles = [
   {
     _id: '5f5e5d7241f8dd517537c1fb',
     name: 'user',
+  },
+  {
+    _id: '5f5e5d6d120a8bdf0aadda5e',
+    name: 'admin',
+  },
+];
+
+const mockModeratorRoles = [
+  {
+    _id: '5f5e5d7241f8dd517537c1fb',
+    name: 'moderator',
   },
   {
     _id: '5f5e5d6d120a8bdf0aadda5e',
@@ -104,7 +115,12 @@ describe('authJwt', () => {
     });
   });
 
-  describe('isAdmin()', () => {
+  describe('hasRole()', () => {
+    afterEach(() => {
+      Role.find.restore();
+      User.findById.restore();
+    });
+
     it('should response with 500 when database fails', async () => {
       const findByIdUserStub = sinon
         .stub(User, 'findById')
@@ -119,7 +135,7 @@ describe('authJwt', () => {
       const resSpy = sinon.spy(res, 'send');
       const next = sinon.stub().callsFake(() => true);
 
-      const result = await authJwt.isAdmin(req, res, next);
+      const result = await authJwt.hasRole(userRole.ADMIN)(req, res, next);
 
       expect(result).to.be.equal(false);
       expect(res.statusCode).to.be.equal(500);
@@ -128,7 +144,61 @@ describe('authJwt', () => {
       expect(res._getData().error.message).to.be.equal('Database error');
       expect(findByIdUserStub.calledOnce).to.be.equal(true);
       expect(findRoleStub.calledOnce).to.be.equal(true);
+    });
 
+    it('should response with 503 when user does not have admin role', async () => {
+      const findByIdUserStub = sinon.stub(User, 'findById').returns(mockUser);
+
+      const findRoleStub = sinon.stub(Role, 'find').returns(mockUserRoles);
+
+      const req = httpMocks.createRequest({ userId });
+      const res = httpMocks.createResponse();
+      const resSpy = sinon.spy(res, 'send');
+      const next = sinon.stub().callsFake(() => true);
+
+      const result = await authJwt.hasRole(userRole.ADMIN)(req, res, next);
+
+      expect(result).to.be.equal(false);
+      expect(res.statusCode).to.be.equal(403);
+      expect(resSpy.calledOnce).to.be.equal(true);
+      expect(next.notCalled).to.be.equal(true);
+      expect(res._getData().error.message).to.be.equal(
+        `${common.REQUIRED_ROLE}: ${userRole.ADMIN}`
+      );
+      expect(findByIdUserStub.calledOnce).to.be.equal(true);
+      expect(findByIdUserStub.args[0][0]).to.be.equal(userId);
+      expect(findRoleStub.calledOnce).to.be.equal(true);
+      expect(findRoleStub.args[0][0]).to.be.deep.equal({
+        _id: { $in: mockUser.roles },
+      });
+    });
+
+    it('should return true and call next() when user have admin role', async () => {
+      const findByIdUserStub = sinon.stub(User, 'findById').returns(mockUser);
+
+      const findRoleStub = sinon.stub(Role, 'find').returns(mockAdminRoles);
+
+      const req = httpMocks.createRequest({ userId });
+      const res = httpMocks.createResponse();
+      const resSpy = sinon.spy(res, 'send');
+      const next = sinon.stub().callsFake(() => true);
+
+      const result = await authJwt.hasRole(userRole.ADMIN)(req, res, next);
+
+      expect(resSpy.notCalled).to.be.equal(true);
+      expect(next.calledOnce).to.be.equal(true);
+      expect(result).to.be.equal(true);
+      expect(findByIdUserStub.calledOnce).to.be.equal(true);
+      expect(findByIdUserStub.args[0][0]).to.be.equal(userId);
+      expect(findRoleStub.calledOnce).to.be.equal(true);
+      expect(findRoleStub.args[0][0]).to.be.deep.equal({
+        _id: { $in: mockUser.roles },
+      });
+    });
+  });
+
+  describe('isAdmin()', () => {
+    afterEach(() => {
       Role.find.restore();
       User.findById.restore();
     });
@@ -150,7 +220,7 @@ describe('authJwt', () => {
       expect(resSpy.calledOnce).to.be.equal(true);
       expect(next.notCalled).to.be.equal(true);
       expect(res._getData().error.message).to.be.equal(
-        middleware.authJwt.ADMIN_ROLE_REQUIRED
+        `${common.REQUIRED_ROLE}: ${userRole.ADMIN}`
       );
       expect(findByIdUserStub.calledOnce).to.be.equal(true);
       expect(findByIdUserStub.args[0][0]).to.be.equal(userId);
@@ -158,9 +228,6 @@ describe('authJwt', () => {
       expect(findRoleStub.args[0][0]).to.be.deep.equal({
         _id: { $in: mockUser.roles },
       });
-
-      Role.find.restore();
-      User.findById.restore();
     });
 
     it('should return true and call next() when user have admin role', async () => {
@@ -174,6 +241,63 @@ describe('authJwt', () => {
       const next = sinon.stub().callsFake(() => true);
 
       const result = await authJwt.isAdmin(req, res, next);
+
+      expect(resSpy.notCalled).to.be.equal(true);
+      expect(next.calledOnce).to.be.equal(true);
+      expect(result).to.be.equal(true);
+      expect(findByIdUserStub.calledOnce).to.be.equal(true);
+      expect(findByIdUserStub.args[0][0]).to.be.equal(userId);
+      expect(findRoleStub.calledOnce).to.be.equal(true);
+      expect(findRoleStub.args[0][0]).to.be.deep.equal({
+        _id: { $in: mockUser.roles },
+      });
+    });
+  });
+
+  describe('isModerator()', () => {
+    afterEach(() => {
+      Role.find.restore();
+      User.findById.restore();
+    });
+
+    it('should response with 503 when user does not have moderator role', async () => {
+      const findByIdUserStub = sinon.stub(User, 'findById').returns(mockUser);
+
+      const findRoleStub = sinon.stub(Role, 'find').returns(mockUserRoles);
+
+      const req = httpMocks.createRequest({ userId });
+      const res = httpMocks.createResponse();
+      const resSpy = sinon.spy(res, 'send');
+      const next = sinon.stub().callsFake(() => true);
+
+      const result = await authJwt.hasRole(userRole.MODERATOR)(req, res, next);
+
+      expect(result).to.be.equal(false);
+      expect(res.statusCode).to.be.equal(403);
+      expect(resSpy.calledOnce).to.be.equal(true);
+      expect(next.notCalled).to.be.equal(true);
+      expect(res._getData().error.message).to.be.equal(
+        `${common.REQUIRED_ROLE}: ${userRole.MODERATOR}`
+      );
+      expect(findByIdUserStub.calledOnce).to.be.equal(true);
+      expect(findByIdUserStub.args[0][0]).to.be.equal(userId);
+      expect(findRoleStub.calledOnce).to.be.equal(true);
+      expect(findRoleStub.args[0][0]).to.be.deep.equal({
+        _id: { $in: mockUser.roles },
+      });
+    });
+
+    it('should return true and call next() when user have moderator role', async () => {
+      const findByIdUserStub = sinon.stub(User, 'findById').returns(mockUser);
+
+      const findRoleStub = sinon.stub(Role, 'find').returns(mockModeratorRoles);
+
+      const req = httpMocks.createRequest({ userId });
+      const res = httpMocks.createResponse();
+      const resSpy = sinon.spy(res, 'send');
+      const next = sinon.stub().callsFake(() => true);
+
+      const result = await authJwt.isModerator(req, res, next);
 
       expect(resSpy.notCalled).to.be.equal(true);
       expect(next.calledOnce).to.be.equal(true);

@@ -28,6 +28,7 @@ const common = {
   NOT_FOUND: 'Not Found',
   RESPONSE: 'Response',
   REQUEST: 'Request',
+  REQUIRED_ROLE: 'Required Role',
 };
 
 const userRole = {
