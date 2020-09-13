@@ -13,6 +13,12 @@ const middleware = {
     EMAIL_EXISTS: 'Failed! Email is already in use',
     NON_EXISTENT_ROLE: 'Failed! Non existent role',
   },
+  authJwt: {
+    AUTH_JWT_MIDDLEWARE: 'Auth JWT middleware',
+    ADMIN_ROLE_REQUIRED: 'Require Admin Role',
+    NO_TOKEN_PROVIDED: 'No Token provide',
+    UNAUTHORIZED: 'Unauthorized',
+  },
 };
 
 const common = {
