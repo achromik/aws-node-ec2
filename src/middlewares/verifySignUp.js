@@ -37,14 +37,12 @@ const checkDuplicateUsernameOrEmail = async (req, res, next) => {
         middleware.verifySignUp.EMAIL_EXISTS
       );
 
-      res
-        .status(400)
-        .send({
-          error: {
-            statusCode: 400,
-            message: middleware.verifySignUp.EMAIL_EXISTS,
-          },
-        });
+      res.status(400).send({
+        error: {
+          statusCode: 400,
+          message: middleware.verifySignUp.EMAIL_EXISTS,
+        },
+      });
       return;
     }
 
@@ -55,14 +53,12 @@ const checkDuplicateUsernameOrEmail = async (req, res, next) => {
       middleware.verifySignUp.VERIFY_SIGNUP_MIDDLEWARE
     );
 
-    res
-      .status(500)
-      .send({
-        error: {
-          statusCode: 400,
-          message: err.message || common.UNKNOWN_ERROR,
-        },
-      });
+    res.status(500).send({
+      error: {
+        statusCode: 500,
+        message: err.message || common.UNKNOWN_ERROR,
+      },
+    });
     return;
   }
 };
@@ -74,16 +70,14 @@ const checkRoleExisted = (req, res, next) => {
     );
 
     if (nonExistentRoles.length) {
-      res
-        .status(400)
-        .send({
-          error: {
-            statusCode: 400,
-            message: `${middleware.verifySignUp.NON_EXISTENT_ROLE}${
-              nonExistentRoles.length > 1 ? 's' : ''
-            }: ${nonExistentRoles.join(', ')}`,
-          },
-        });
+      res.status(400).send({
+        error: {
+          statusCode: 400,
+          message: `${middleware.verifySignUp.NON_EXISTENT_ROLE}${
+            nonExistentRoles.length > 1 ? 's' : ''
+          }: ${nonExistentRoles.join(', ')}`,
+        },
+      });
       return null;
     }
   }

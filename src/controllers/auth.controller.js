@@ -9,15 +9,20 @@ const { auth, userRole } = require('../config/constants');
 const User = db.user;
 const Role = db.role;
 
-exports.signUp = async (req, res) => {
+exports.signUp = async (req, res, next) => {
+  // if (!req.body.password) {
+  //   res.status(400).send({
+  //     error: { statusCode: 400, message: 'Missing password property' },
+  //   });
+  //   return;
+  // }
+
   try {
     const user = User({
       username: req.body.username,
       email: req.body.email,
-      password: bcrypt.hashSync(req.body.password, 8),
+      password: bcrypt.hashSync(req.body.password || '', 8),
     });
-
-    // const result = await user.save();
 
     if (req.body.roles) {
       const roles = await Role.find({ name: { $in: req.body.roles } });
@@ -39,7 +44,7 @@ exports.signUp = async (req, res) => {
       `${auth.SIGNUP_CONTROLLER}: ${auth.SIGNUP_FAILURE}`
     );
 
-    res.status(500).send({ message: err.message });
+    res.status(500).send({ error: { statusCode: 500, message: err.message } });
     return;
   }
 };
