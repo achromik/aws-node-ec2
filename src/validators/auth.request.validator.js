@@ -1,11 +1,11 @@
 const Joi = require('joi');
 
-const AppLogger = require('../../config/logger');
-const { auth, common } = require('../../config/constants');
+const AppLogger = require('../config/logger');
+const { auth, common } = require('../config/constants');
 
-const { signupSchema } = require('../../schemas/auth.schema');
-const validateRequest = require('../../util/validateRequest');
-const validationErrorDetailsToString = require('../../util/validationErrorDetailsToString');
+const { signupSchema } = require('../schemas/auth.schema');
+const validateRequest = require('../util/validateRequest');
+const validationErrorDetailsToString = require('../util/validationErrorDetailsToString');
 
 const signup = async (req, res, next) => {
   try {
