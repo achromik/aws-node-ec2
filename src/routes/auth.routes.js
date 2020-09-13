@@ -20,4 +20,6 @@ module.exports = (app) => {
     ],
     controller.signUp
   );
+
+  app.post('/auth/signin', controller.signIn);
 };
