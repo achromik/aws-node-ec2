@@ -2,7 +2,10 @@
   "prettier.singleQuote": true,
   "editor.formatOnSave": true,
   "standard.enable": false,
-  "cSpell.words": ["Mockgoose"],
+  "cSpell.words": [
+    "Mockgoose",
+    "Signin"
+  ],
   "mochaExplorer.env": {
     "NODE_ENV": "test"
 },
