@@ -1,4 +1,4 @@
-module.exports = (req, schema) => {
+exports.body = (req, schema) => {
   const options = {
     abortEarly: false, //include all errors
     allowUnknown: true, //ignore unknown props

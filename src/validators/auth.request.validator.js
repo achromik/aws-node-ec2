@@ -9,7 +9,7 @@ const validationErrorDetailsToString = require('../util/validationErrorDetailsTo
 
 const signup = async (req, res, next) => {
   try {
-    const value = await validateRequest(req, signupSchema);
+    const value = await validateRequest.body(req, signupSchema);
     req.body = value;
     next();
   } catch (err) {
