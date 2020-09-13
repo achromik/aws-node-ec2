@@ -24,7 +24,7 @@ const checkDuplicateUsernameOrEmail = async (req, res, next) => {
           message: middleware.verifySignUp.USERNAME_EXISTS,
         },
       });
-      return;
+      return true;
     }
 
     const email = await User.findOne({
@@ -43,7 +43,7 @@ const checkDuplicateUsernameOrEmail = async (req, res, next) => {
           message: middleware.verifySignUp.EMAIL_EXISTS,
         },
       });
-      return;
+      return true;
     }
 
     next();
@@ -78,7 +78,7 @@ const checkRoleExisted = (req, res, next) => {
           }: ${nonExistentRoles.join(', ')}`,
         },
       });
-      return null;
+      return true;
     }
   }
   next();
