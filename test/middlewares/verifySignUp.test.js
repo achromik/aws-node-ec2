@@ -6,9 +6,9 @@ const { verifySignUp } = require('../../src/middlewares');
 const { common, userRole, middleware } = require('../../src/config/constants');
 
 const db = require('../../src/models');
-const Role = require('../../src/models/role.model');
 
 const User = db.user;
+const Role = db.role;
 
 const userPayload = {
   username: 'Logan Palmer',
