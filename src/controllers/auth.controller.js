@@ -5,6 +5,7 @@ const config = require('../config/auth.config');
 const db = require('../models');
 const AppLogger = require('../config/logger');
 const { auth, userRole } = require('../config/constants');
+const responseWithError = require('../util/responseWithError');
 
 const User = db.user;
 const Role = db.role;
@@ -44,7 +45,7 @@ exports.signUp = async (req, res, next) => {
       `${auth.SIGNUP_CONTROLLER}: ${auth.SIGNUP_FAILURE}`
     );
 
-    res.status(500).send({ error: { statusCode: 500, message: err.message } });
+    responseWithError(500, message)(res);
     return;
   }
 };
