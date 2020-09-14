@@ -6,7 +6,7 @@
   "scripts": {
     "test": "NODE_ENV=test nyc --reporter=text --reporter=lcov --all mocha -c --exit test/**/*.test.js",
     "start": "node src/server.js | bunyan -o short",
-    "dev": "nodemon -r dotenv/config src/server.js | bunyan -o short"
+    "dev": "nodemon --ignore './test/' -r dotenv/config src/server.js | bunyan -o short"
   },
   "author": "",
   "license": "ISC",
