@@ -26,7 +26,7 @@ exports.signUp = async (req, res, next) => {
       password: bcrypt.hashSync(req.body.password || '', 8),
     });
 
-    if (req.body.roles) {
+    if (req.body.roles && req.body.roles.length) {
       const roles = await Role.find({ name: { $in: req.body.roles } });
 
       user.roles = roles.map((role) => role._id);
@@ -46,7 +46,7 @@ exports.signUp = async (req, res, next) => {
       `${auth.SIGNUP_CONTROLLER}: ${auth.SIGNUP_FAILURE}`
     );
 
-    responseWithError(500, message)(res);
+    responseWithError(500, err.message)(res);
     return;
   }
 };
