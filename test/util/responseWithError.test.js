@@ -14,7 +14,6 @@ describe('responseWithError', () => {
     const result = responseWithError(status, message);
 
     expect(result).to.be.instanceOf(Function);
-    // expect(res.statusCode).to.be.equal(500);
   });
 
   it('should return response function with passed arguments', () => {
@@ -26,7 +25,6 @@ describe('responseWithError', () => {
 
     const result = responseWithError(status, message)(res);
 
-    // expect(result).to.be.instanceOf(Function);
     expect(res.statusCode).to.be.equal(500);
     expect(resSpy.calledOnce).to.be.equal(true);
     expect(res._getData()).to.have.property('error');
