@@ -1,6 +1,4 @@
-const { except, expect } = require('chai');
-const sinon = require('sinon');
-const joi = require('joi');
+const { expect } = require('chai');
 const httpMocks = require('node-mocks-http');
 const Joi = require('joi');
 
@@ -53,7 +51,7 @@ describe('validateRequest', () => {
     const req = httpMocks.createRequest({ body: payload });
 
     try {
-      const value = await validateRequest.body(req, schema);
+      await validateRequest.body(req, schema);
     } catch (error) {
       expect(error).to.be.instanceOf(Error);
       expect(error.message).to.contain('number');

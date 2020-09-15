@@ -1,14 +1,13 @@
-const expect = require('chai').expect;
+const { expect } = require('chai');
 const sinon = require('sinon');
 const httpMocks = require('node-mocks-http');
 
 const { verifySignUp } = require('../../src/middlewares');
-const { common, userRole, middleware } = require('../../src/config/constants');
+const { userRole, middleware } = require('../../src/config/constants');
 
 const db = require('../../src/models');
 
 const User = db.user;
-const Role = db.role;
 
 const userPayload = {
   username: 'Logan Palmer',
@@ -18,9 +17,7 @@ const userPayload = {
 describe('middleware verifySignUp', () => {
   describe('checkDuplicateUsernameOrEmail()', () => {
     it('should response 500 when database fails', async () => {
-      const findOneUserStub = sinon
-        .stub(User, 'findOne')
-        .throws(new Error('Database error'));
+      sinon.stub(User, 'findOne').throws(new Error('Database error'));
 
       const req = httpMocks.createRequest();
 
@@ -29,12 +26,7 @@ describe('middleware verifySignUp', () => {
 
       const next = sinon.stub().callsFake(() => true);
 
-      const result = await verifySignUp.checkDuplicateUsernameOrEmail(
-        req,
-        res,
-        next
-      );
-      // console.log(res._getData());
+      await verifySignUp.checkDuplicateUsernameOrEmail(req, res, next);
 
       expect(next.notCalled).to.be.equal(true);
       expect(resSpy.calledOnce).to.be.equal(true);
@@ -50,7 +42,7 @@ describe('middleware verifySignUp', () => {
         body: userPayload,
       });
 
-      const findOneUserStub = sinon
+      sinon
         .stub(User, 'findOne')
         .withArgs({ username: userPayload.username })
         .returns(true)
@@ -62,11 +54,7 @@ describe('middleware verifySignUp', () => {
 
       const next = sinon.stub().callsFake(() => true);
 
-      const result = await verifySignUp.checkDuplicateUsernameOrEmail(
-        req,
-        res,
-        next
-      );
+      await verifySignUp.checkDuplicateUsernameOrEmail(req, res, next);
 
       expect(next.notCalled).to.be.equal(true);
       expect(resSpy.calledOnce).to.be.equal(true);
@@ -84,7 +72,7 @@ describe('middleware verifySignUp', () => {
         body: userPayload,
       });
 
-      const findOneUserStub = sinon
+      sinon
         .stub(User, 'findOne')
         .withArgs({ username: userPayload.username })
         .returns(false)
@@ -96,11 +84,7 @@ describe('middleware verifySignUp', () => {
 
       const next = sinon.stub().callsFake(() => true);
 
-      const result = await verifySignUp.checkDuplicateUsernameOrEmail(
-        req,
-        res,
-        next
-      );
+      await verifySignUp.checkDuplicateUsernameOrEmail(req, res, next);
 
       expect(next.notCalled).to.be.equal(true);
       expect(resSpy.calledOnce).to.be.equal(true);
@@ -117,8 +101,7 @@ describe('middleware verifySignUp', () => {
       const req = httpMocks.createRequest({
         body: userPayload,
       });
-
-      const findOneUserStub = sinon
+      sinon
         .stub(User, 'findOne')
         .withArgs({ username: userPayload.username })
         .returns(false)
@@ -130,11 +113,7 @@ describe('middleware verifySignUp', () => {
 
       const next = sinon.stub().callsFake(() => true);
 
-      const result = await verifySignUp.checkDuplicateUsernameOrEmail(
-        req,
-        res,
-        next
-      );
+      await verifySignUp.checkDuplicateUsernameOrEmail(req, res, next);
 
       expect(next.calledOnce).to.be.equal(true);
       expect(resSpy.notCalled).to.be.equal(true);
@@ -158,7 +137,6 @@ describe('middleware verifySignUp', () => {
 
       verifySignUp.checkRoleExisted(req, res, next);
 
-      // expect(result).to.be.equal(true);
       expect(resSpy.notCalled).to.be.equal(true);
       expect(next.calledOnce).to.be.equal(true);
       expect(next.returnValues[0]).to.be.equal(true);

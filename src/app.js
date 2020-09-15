@@ -1,5 +1,4 @@
 const express = require('express');
-const app = express();
 const addRequestId = require('express-request-id')();
 
 const { common } = require('./config/constants');
@@ -7,8 +6,8 @@ const AppLogger = require('./config/logger');
 const { baseApiPath } = require('./config/app.config');
 const authRoutes = require('./routes/auth.routes');
 const userRoutes = require('./routes/user.routes');
-const { Router } = require('express');
 
+const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(addRequestId);

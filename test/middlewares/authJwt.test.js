@@ -1,15 +1,13 @@
-const expect = require('chai').expect;
+const { expect } = require('chai');
 const sinon = require('sinon');
 const httpMocks = require('node-mocks-http');
 const jwt = require('jsonwebtoken');
 
-const responseWithError = require('../../src/util/responseWithError');
 const { authJwt } = require('../../src/middlewares');
 const { userRole, middleware, common } = require('../../src/config/constants');
 const authConfig = require('../../src/config/auth.config');
-
 const db = require('../../src/models');
-const e = require('express');
+
 const User = db.user;
 const Role = db.role;
 
@@ -62,7 +60,7 @@ describe('authJwt', () => {
       const resSpy = sinon.spy(res, 'send');
       const next = sinon.stub().callsFake(() => true);
 
-      const result = authJwt.verifyToken(req, res, next);
+      authJwt.verifyToken(req, res, next);
 
       expect(res.statusCode).to.be.equal(403);
       expect(resSpy.calledOnce).to.be.equal(true);

@@ -9,8 +9,6 @@ describe('responseWithError', () => {
     const message = 'test message';
     const status = 500;
 
-    const res = httpMocks.createResponse();
-
     const result = responseWithError(status, message);
 
     expect(result).to.be.instanceOf(Function);
@@ -23,7 +21,7 @@ describe('responseWithError', () => {
     const res = httpMocks.createResponse();
     const resSpy = sinon.spy(res, 'send');
 
-    const result = responseWithError(status, message)(res);
+    responseWithError(status, message)(res);
 
     expect(res.statusCode).to.be.equal(500);
     expect(resSpy.calledOnce).to.be.equal(true);

@@ -4,10 +4,16 @@
   "standard.enable": false,
   "cSpell.words": [
     "Mockgoose",
-    "Signin"
+    "Serialzer",
+    "Signin",
+    "serializers",
+    "xdescribe"
   ],
   "mochaExplorer.env": {
     "NODE_ENV": "test"
 },
-"editor.tabSize": 2
+"editor.tabSize": 2,
+"rest-client.fontSize": 11,
+"rest-client.requestNameAsResponseTabTitle": true,
+"rest-client.previewResponsePanelTakeFocus": false
 }

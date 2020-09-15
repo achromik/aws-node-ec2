@@ -31,7 +31,9 @@ const signin = async (req, res, next) => {
   try {
     const value = await validateRequest.body(req, signinSchema);
     req.body = value;
+
     next();
+    return true;
   } catch (err) {
     const message = prepareMessage(err.details);
 

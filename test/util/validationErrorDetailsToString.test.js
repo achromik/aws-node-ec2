@@ -2,7 +2,7 @@ const { expect } = require('chai');
 const validationErrorDetailsToString = require('../../src/util/validationErrorDetailsToString');
 
 describe('validationErrorDetailsToString()', () => {
-  details = [
+  const details = [
     {
       message: '"a" must be a string',
       path: ['a'],
@@ -33,7 +33,7 @@ describe('validationErrorDetailsToString()', () => {
 
   it('should throw an error when the passed argument is not array', () => {
     try {
-      const result = validationErrorDetailsToString('string');
+      validationErrorDetailsToString('string');
     } catch (err) {
       expect(err).to.be.instanceOf(Error);
       expect(err.message).to.be.equal('Invalid argument. Should be an array');
@@ -42,7 +42,7 @@ describe('validationErrorDetailsToString()', () => {
 
   it('should throw an error when no argument passed', () => {
     try {
-      const result = validationErrorDetailsToString();
+      validationErrorDetailsToString();
     } catch (err) {
       expect(err).to.be.instanceOf(Error);
       expect(err.message).to.be.equal('Missing argument');

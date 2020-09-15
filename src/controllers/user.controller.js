@@ -1,9 +1,10 @@
 const AppLogger = require('../config/logger');
 const db = require('../models');
+
 const User = db.user;
 
 const saveUser = async (req, res, next) => {
-  const body = req.body;
+  const { body } = req;
   try {
     const user = new User(body);
     const result = await user.save({ body });

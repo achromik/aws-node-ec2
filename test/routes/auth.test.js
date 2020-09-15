@@ -8,7 +8,6 @@ const authRoutes = require('../../src/routes/auth.routes');
 const controller = require('../../src/controllers/auth.controller');
 const { verifySignUp } = require('../../src/middlewares');
 const { authValidator } = require('../../src/validators');
-const e = require('express');
 
 let app;
 let sandbox;

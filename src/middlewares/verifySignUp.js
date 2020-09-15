@@ -3,7 +3,6 @@ const AppLogger = require('../config/logger');
 const { ROLES } = require('../models');
 const db = require('../models');
 
-const ROLE = db.ROLES;
 const User = db.user;
 
 const checkDuplicateUsernameOrEmail = async (req, res, next) => {
@@ -47,6 +46,7 @@ const checkDuplicateUsernameOrEmail = async (req, res, next) => {
     }
 
     next();
+    return false;
   } catch (err) {
     AppLogger.log.error(
       { err },
@@ -59,7 +59,7 @@ const checkDuplicateUsernameOrEmail = async (req, res, next) => {
         message: err.message || common.UNKNOWN_ERROR,
       },
     });
-    return;
+    return true;
   }
 };
 
@@ -82,6 +82,7 @@ const checkRoleExisted = (req, res, next) => {
     }
   }
   next();
+  return false;
 };
 
 module.exports = { checkDuplicateUsernameOrEmail, checkRoleExisted };

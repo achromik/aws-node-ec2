@@ -6,7 +6,8 @@
   "scripts": {
     "test": "NODE_ENV=test nyc --reporter=text --reporter=lcov --all mocha -c --exit test/**/*.test.js",
     "start": "node src/server.js | bunyan -o short",
-    "dev": "nodemon --ignore './test/' -r dotenv/config src/server.js | bunyan -o short"
+    "dev": "nodemon --ignore './test/' -r dotenv/config src/server.js | bunyan -o short",
+    "lint": "eslint \"**/*.js\" --ignore-pattern node_modules/"
   },
   "author": "",
   "license": "ISC",
@@ -25,10 +26,16 @@
     "chai": "^4.2.0",
     "chai-http": "^4.3.0",
     "dotenv": "^8.2.0",
+    "eslint": "^7.9.0",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-prettier": "^3.1.4",
     "mocha": "^8.1.3",
     "node-mocks-http": "^1.9.0",
     "nodemon": "^2.0.4",
     "nyc": "^15.1.0",
+    "prettier": "^2.1.1",
     "sinon": "^9.0.3"
   },
   "mocha": {}
