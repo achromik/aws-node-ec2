@@ -4,9 +4,10 @@ const addRequestId = require('express-request-id')();
 
 const { common } = require('./config/constants');
 const AppLogger = require('./config/logger');
-
+const { baseApiPath } = require('./config/app.config');
 const authRoutes = require('./routes/auth.routes');
 const userRoutes = require('./routes/user.routes');
+const { Router } = require('express');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -41,7 +42,7 @@ app.get('/', (req, res, next) => {
   res.json({ message: 'Welcome' });
 });
 
-authRoutes(app);
+authRoutes(app, baseApiPath);
 userRoutes(app);
 
 app.use((req, res, next) => {
@@ -52,7 +53,10 @@ app.use((req, res, next) => {
 });
 
 app.use((error, req, res, next) => {
-  AppLogger.log.error({ err: error, req });
+  AppLogger.log.error(
+    { id: req.id, path: req.path, message: error.message },
+    `Error occurred: ${req.path}`
+  );
 
   res.status(error.status || 500).send({
     error: {
