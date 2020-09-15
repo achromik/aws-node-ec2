@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
-const config = require('../config/auth.config');
 const db = require('../models');
 const AppLogger = require('../config/logger');
 const { auth, userRole } = require('../config/constants');
@@ -12,12 +11,12 @@ const User = db.user;
 const Role = db.role;
 
 exports.signUp = async (req, res, next) => {
-  // if (!req.body.password) {
-  //   res.status(400).send({
-  //     error: { statusCode: 400, message: 'Missing password property' },
-  //   });
-  //   return;
-  // }
+  if (!req.body.password || !req.body.username || !req.body.email) {
+    const error = new Error('Missing user data');
+    error.status = 400;
+    next(error);
+    return;
+  }
 
   try {
     const user = User({
@@ -40,14 +39,15 @@ exports.signUp = async (req, res, next) => {
     AppLogger.log.info(`${auth.SIGNUP_CONTROLLER}: ${auth.SIGNUP_SUCCESS}`);
 
     res.status(201).send(result);
+    return;
   } catch (err) {
     AppLogger.log.error(
       { err },
       `${auth.SIGNUP_CONTROLLER}: ${auth.SIGNUP_FAILURE}`
     );
 
-    responseWithError(500, err.message)(res);
-    return;
+    err.status = 500;
+    next(err);
   }
 };
 
@@ -87,6 +87,7 @@ exports.signIn = async (req, res, next) => {
       roles: authorities,
       accessToken: token,
     });
+    return;
   } catch (err) {
     AppLogger.log.error(
       { err },

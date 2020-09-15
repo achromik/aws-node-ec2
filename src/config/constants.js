@@ -3,8 +3,9 @@ const auth = {
   SIGNIN_CONTROLLER: 'Signin Controller',
   SIGNUP_SUCCESS: 'User registration successful',
   SIGNUP_FAILURE: 'User registration failed',
-  SIGNUP_FAILURE: 'User login failed',
+  SIGNIN_FAILURE: 'User login failed',
   SIGNUP_VALIDATOR: 'Signup Validator',
+  SIGNIN_VALIDATOR: 'Signin Validator',
   USER_NOT_FOUND: 'User Not Found',
   INVALID_PASSWORD: 'Invalid password',
 };

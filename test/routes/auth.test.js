@@ -1,12 +1,14 @@
-const expect = require('chai').expect;
+const { expect } = require('chai');
 const sinon = require('sinon');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 
 const conn = require('../../src/config/db');
+const authRoutes = require('../../src/routes/auth.routes');
 const controller = require('../../src/controllers/auth.controller');
-const verifySignUp = require('../../src/middlewares').verifySignUp;
-const authValidator = require('../../src/validators').authValidator;
+const { verifySignUp } = require('../../src/middlewares');
+const { authValidator } = require('../../src/validators');
+const e = require('express');
 
 let app;
 let sandbox;
@@ -28,21 +30,19 @@ describe('API auth routes', () => {
       roles: ['admin'],
     };
 
-    beforeEach(async () => {
+    const clearCachedModules = () => {
       delete require.cache[require.resolve('../../src/validators')];
       delete require.cache[require.resolve('../../src/middlewares')];
       delete require.cache[require.resolve('../../src/app')];
       delete require.cache[
         require.resolve('../../src/controllers/auth.controller')
       ];
+    };
+
+    beforeEach(async () => {
+      clearCachedModules();
 
       sandbox = sinon.createSandbox();
-
-      signUpStub = sandbox
-        .stub(controller, 'signUp')
-        .callsFake((req, res, next) => {
-          res.status(200).send({ text: 'test' });
-        });
 
       signupPayloadValidationStub = sandbox
         .stub(authValidator, 'signup')
@@ -62,7 +62,16 @@ describe('API auth routes', () => {
           next();
         });
 
+      signUpStub = sandbox
+        .stub(controller, 'signUp')
+        .callsFake((req, res, next) => {
+          res.status(200).send({ text: 'test' });
+        });
+
+      // eslint-disable-next-line global-require
       app = require('../../src/app');
+
+      authRoutes(app);
     });
 
     afterEach(async () => {
@@ -80,13 +89,7 @@ describe('API auth routes', () => {
     });
 
     after(async () => {
-      delete require.cache[require.resolve('../../src/validators')];
-      delete require.cache[require.resolve('../../src/middlewares')];
-      delete require.cache[require.resolve('../../src/app')];
-      delete require.cache[
-        require.resolve('../../src/controllers/auth.controller')
-      ];
-
+      clearCachedModules();
       await conn.close();
     });
 
@@ -98,7 +101,6 @@ describe('API auth routes', () => {
             message: 'Failed request payload validation',
           },
         });
-        return;
       });
 
       const res = await chai.request(app).post(apiURL).send(payload);
@@ -168,9 +170,11 @@ describe('API auth routes', () => {
     });
 
     it('should call middlewares in specific order', async () => {
-      const res = await chai.request(app).post(apiURL).send(payload);
+      await chai.request(app).post(apiURL).send(payload);
 
-      sinon.assert.callOrder(
+      expect(signUpStub.calledOnce).to.be.equal(true);
+
+      await sinon.assert.callOrder(
         signupPayloadValidationStub,
         checkDuplicateUsernameOrEmailStub,
         checkRoleExistedStub
@@ -181,6 +185,7 @@ describe('API auth routes', () => {
   describe('POST /auth/signin', () => {
     const apiURL = '/auth/signin';
     let signInStub;
+    let signinPayloadValidationStub;
 
     const payload = {
       username: 'Foo Bar',
@@ -189,36 +194,44 @@ describe('API auth routes', () => {
       roles: ['admin'],
     };
 
-    before((done) => {
-      conn
-        .connectDB()
-        .then(() => done())
-        .catch((err) => done(err));
+    const clearCachedModules = () => {
+      delete require.cache[
+        require.resolve('../../src/controllers/auth.controller')
+      ];
+      delete require.cache[require.resolve('../../src/app')];
+    };
+
+    before(async () => {
+      conn.connectDB();
     });
 
     beforeEach(async () => {
-      delete require.cache[
-        require.resolve('../../src/controllers/auth.controller')
-      ];
-      delete require.cache[require.resolve('../../src/app')];
+      clearCachedModules();
 
       sandbox = sinon.createSandbox();
 
-      signInStub = sandbox.stub(controller, 'signIn');
+      signInStub = sandbox
+        .stub(controller, 'signIn')
+        .callsFake((req, res, next) => {
+          res.status(200).send({ text: 'test' });
+        });
 
+      signinPayloadValidationStub = sandbox
+        .stub(authValidator, 'signin')
+        .callsFake((res, req, next) => {
+          next();
+        });
+
+      // eslint-disable-next-line global-require
       app = require('../../src/app');
+
+      authRoutes(app);
     });
 
-    after((done) => {
-      delete require.cache[require.resolve('../../src/app')];
-      delete require.cache[
-        require.resolve('../../src/controllers/auth.controller')
-      ];
+    after(async () => {
+      clearCachedModules();
 
-      conn
-        .close()
-        .then(() => done())
-        .catch((err) => done(err));
+      await conn.close();
     });
 
     afterEach((done) => {
@@ -228,18 +241,21 @@ describe('API auth routes', () => {
       done();
     });
 
-    xit('should return 400 when payload validation fails', async () => {
+    it('should return 400 when payload validation fails', async () => {
+      signinPayloadValidationStub.callsFake((res, req, next) => {
+        const error = new Error('Validation fails');
+        error.status = 400;
+        next(error);
+      });
+
       const res = await chai.request(app).post(apiURL).send();
 
       expect(signInStub.notCalled).to.be.equal(true);
+      expect(res.status).to.be.equal(400);
+      expect(res.body.error.message).to.be.equal('Validation fails');
     });
 
     it('should call signin controller when middleware validation passed', async () => {
-      signInStub.callsFake((req, res, next) => {
-        res.status(200).send({ text: 'test' });
-        return;
-      });
-
       const res = await chai.request(app).post(apiURL).send(payload);
 
       expect(signInStub.calledOnce).to.be.equal(true);

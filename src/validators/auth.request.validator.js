@@ -1,11 +1,12 @@
-const Joi = require('joi');
-
 const AppLogger = require('../config/logger');
 const { auth, common } = require('../config/constants');
 
-const { signupSchema } = require('../schemas/auth.schema');
+const { signupSchema, signinSchema } = require('../schemas/auth.schema');
 const validateRequest = require('../util/validateRequest');
 const validationErrorDetailsToString = require('../util/validationErrorDetailsToString');
+
+const prepareMessage = (details) =>
+  `${common.VALIDATION_ERROR}: ${validationErrorDetailsToString(details)}`;
 
 const signup = async (req, res, next) => {
   try {
@@ -13,9 +14,7 @@ const signup = async (req, res, next) => {
     req.body = value;
     next();
   } catch (err) {
-    const message = `${
-      common.VALIDATION_ERROR
-    }: ${validationErrorDetailsToString(err.details)}`;
+    const message = prepareMessage(err.details);
 
     AppLogger.log.warn({ err }, auth.SIGNUP_VALIDATOR);
 
@@ -28,4 +27,19 @@ const signup = async (req, res, next) => {
   }
 };
 
-module.exports = { signup };
+const signin = async (req, res, next) => {
+  try {
+    const value = await validateRequest.body(req, signinSchema);
+    req.body = value;
+    next();
+  } catch (err) {
+    const message = prepareMessage(err.details);
+
+    AppLogger.log.warn({ err }, auth.SIGNIN_VALIDATOR);
+
+    next(new Error(message));
+    return false;
+  }
+};
+
+module.exports = { signup, signin };

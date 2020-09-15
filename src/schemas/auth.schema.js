@@ -11,4 +11,9 @@ const signupSchema = Joi.object({
     .items(Joi.string().valid(...Object.values(userRole))),
 });
 
-module.exports = { signupSchema };
+const signinSchema = Joi.object({
+  username: Joi.string().required(),
+  password: Joi.string().required(),
+});
+
+module.exports = { signupSchema, signinSchema };

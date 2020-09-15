@@ -1,6 +1,6 @@
 const express = require('express');
 
-const { verifySignUp, asyncRoute } = require('../middlewares');
+const { verifySignUp } = require('../middlewares');
 const controller = require('../controllers/auth.controller');
 const { authValidator } = require('../validators');
 
@@ -25,7 +25,7 @@ module.exports = (app, prefix = '', path = '/auth') => {
     controller.signUp
   );
 
-  router.post('/signin', controller.signIn);
+  router.post('/signin', [authValidator.signin], controller.signIn);
 
   app.use(prefix + path, router);
 };
