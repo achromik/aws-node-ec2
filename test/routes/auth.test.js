@@ -42,7 +42,6 @@ describe('API auth routes', () => {
         .stub(controller, 'signUp')
         .callsFake((req, res, next) => {
           res.status(200).send({ text: 'test' });
-          return;
         });
 
       signupPayloadValidationStub = sandbox
@@ -66,7 +65,7 @@ describe('API auth routes', () => {
       app = require('../../src/app');
     });
 
-    afterEach((done) => {
+    afterEach(async () => {
       verifySignUp.checkDuplicateUsernameOrEmail.restore();
       verifySignUp.checkRoleExisted.restore();
       authValidator.signup.restore();
@@ -74,17 +73,13 @@ describe('API auth routes', () => {
       controller.signUp.restore();
 
       sandbox.restore();
-      done();
     });
 
-    before((done) => {
-      conn
-        .connectDB()
-        .then(() => done())
-        .catch((err) => done(err));
+    before(async () => {
+      await conn.connectDB;
     });
 
-    after((done) => {
+    after(async () => {
       delete require.cache[require.resolve('../../src/validators')];
       delete require.cache[require.resolve('../../src/middlewares')];
       delete require.cache[require.resolve('../../src/app')];
@@ -92,10 +87,7 @@ describe('API auth routes', () => {
         require.resolve('../../src/controllers/auth.controller')
       ];
 
-      conn
-        .close()
-        .then(() => done())
-        .catch((err) => done(err));
+      await conn.close();
     });
 
     it('should not call signup controller when payload validation fails', async () => {
