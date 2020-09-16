@@ -28,7 +28,7 @@ exports.signUp = async (req, res, next) => {
     if (req.body.roles && req.body.roles.length) {
       const roles = await Role.find({ name: { $in: req.body.roles } });
 
-      user.roles = roles.map((role) => role._id);
+      user.roles = roles.map(role => role._id);
     } else {
       const role = await Role.findOne({ name: userRole.USER });
 
@@ -77,7 +77,7 @@ exports.signIn = async (req, res, next) => {
     });
 
     const authorities = user.roles.map(
-      (role) => `ROLE_${role.name.toUpperCase()}`
+      role => `ROLE_${role.name.toUpperCase()}`
     );
 
     res.status(200).send({

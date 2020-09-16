@@ -1,4 +1,4 @@
-module.exports = (details) => {
+module.exports = details => {
   if (!details) {
     throw new Error('Missing argument');
   }
@@ -8,7 +8,7 @@ module.exports = (details) => {
   }
 
   return details
-    .map((x) => x.message)
+    .map(x => x.message)
     .join(', ')
     .replace(/"/g, "'");
 };

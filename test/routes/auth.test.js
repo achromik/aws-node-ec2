@@ -233,7 +233,7 @@ describe('API auth routes', () => {
       await conn.close();
     });
 
-    afterEach((done) => {
+    afterEach(done => {
       controller.signIn.restore();
 
       sandbox.restore();

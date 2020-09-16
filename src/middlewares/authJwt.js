@@ -27,13 +27,13 @@ exports.verifyToken = (req, res, next) => {
   });
 };
 
-const hasRole = (roleName) => async (req, res, next) => {
+const hasRole = roleName => async (req, res, next) => {
   try {
     const user = await User.findById(req.userId);
 
     const roles = await Role.find({ _id: { $in: user.roles } });
 
-    const hasUserRole = roles.some((role) => role.name === roleName);
+    const hasUserRole = roles.some(role => role.name === roleName);
 
     if (hasUserRole) {
       next();

@@ -5,7 +5,7 @@ const { signupSchema, signinSchema } = require('../schemas/auth.schema');
 const validateRequest = require('../util/validateRequest');
 const validationErrorDetailsToString = require('../util/validationErrorDetailsToString');
 
-const prepareMessage = (details) =>
+const prepareMessage = details =>
   `${common.VALIDATION_ERROR}: ${validationErrorDetailsToString(details)}`;
 
 const signup = async (req, res, next) => {

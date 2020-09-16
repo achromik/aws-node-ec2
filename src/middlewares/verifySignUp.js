@@ -66,7 +66,7 @@ const checkDuplicateUsernameOrEmail = async (req, res, next) => {
 const checkRoleExisted = (req, res, next) => {
   if (req.body.roles) {
     const nonExistentRoles = req.body.roles.filter(
-      (role) => !ROLES.includes(role)
+      role => !ROLES.includes(role)
     );
 
     if (nonExistentRoles.length) {

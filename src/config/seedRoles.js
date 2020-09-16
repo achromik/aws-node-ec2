@@ -17,19 +17,19 @@ const seedRoles = () => {
     if (!err && count === 0) {
       new Role({
         name: userRole.USER,
-      }).save((e) => {
+      }).save(e => {
         logRoleSaveResult(userRole.USER, e);
       });
 
       new Role({
         name: userRole.MODERATOR,
-      }).save((e) => {
+      }).save(e => {
         logRoleSaveResult(userRole.MODERATOR, e);
       });
 
       new Role({
         name: userRole.ADMIN,
-      }).save((e) => {
+      }).save(e => {
         logRoleSaveResult(userRole.ADMIN, e);
       });
     } else {

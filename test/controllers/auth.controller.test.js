@@ -3,9 +3,8 @@ const sinon = require('sinon');
 const bcrypt = require('bcryptjs');
 const httpMocks = require('node-mocks-http');
 const jwt = require('jsonwebtoken');
-const mongoose = require('mongoose');
+require('mongoose');
 require('sinon-mongoose');
-// require('sinon-as-promised');
 
 const conn = require('../../src/config/db');
 const db = require('../../src/models');
