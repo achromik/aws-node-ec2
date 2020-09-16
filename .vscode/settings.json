@@ -15,5 +15,6 @@
 "editor.tabSize": 2,
 "rest-client.fontSize": 11,
 "rest-client.requestNameAsResponseTabTitle": true,
-"rest-client.previewResponsePanelTakeFocus": false
+"rest-client.previewResponsePanelTakeFocus": false,
+"prettier.arrowParens": "avoid"
 }
