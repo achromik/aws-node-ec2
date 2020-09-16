@@ -2,12 +2,17 @@ const { expect } = require('chai');
 const sinon = require('sinon');
 const bcrypt = require('bcryptjs');
 const httpMocks = require('node-mocks-http');
+const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
+require('sinon-mongoose');
+// require('sinon-as-promised');
 
 const conn = require('../../src/config/db');
 const db = require('../../src/models');
 const controller = require('../../src/controllers/auth.controller');
 
 const Role = db.role;
+const User = db.user;
 
 const mockUser = {
   username: 'Arthur Griffith',
@@ -40,7 +45,7 @@ describe('auth controller', () => {
     let next;
 
     beforeEach(() => {
-      sinon.stub(bcrypt, 'hashSync').callsFake((arg) => arg);
+      sinon.stub(bcrypt, 'hashSync').callsFake(arg => arg);
       next = sinon.stub().callsFake(() => true);
     });
 
@@ -173,52 +178,110 @@ describe('auth controller', () => {
     });
   });
 
-  xdescribe('signin()', () => {
-    //   const apiURL = '/auth/signin';
-    //   // let app;
-    //   before((done) => {
-    //     conn
-    //       .connectDB()
-    //       .then(() => done())
-    //       .catch((err) => done(err));
-    //   });
-    //   after((done) => {
-    //     conn
-    //       .close()
-    //       .then(() => done())
-    //       .catch((err) => done(err));
-    //   });
-    //   xit('should response with 401 when passed invalid password', async () => {
-    //     const mockDbUser = {
-    //       __id: '5f5e5d1283f636ac2b6eeb32',
-    //       username: 'Logan Palmer',
-    //       email: 'zef@lobzihiz.rs',
-    //       password: 'invalispassword',
-    //       roles: [
-    //         {
-    //           _id: '5f5e5d7241f8dd517537c1fb',
-    //           name: 'user',
-    //         },
-    //         {
-    //           _id: '5f5e5d6d120a8bdf0aadda5e',
-    //           name: 'admin',
-    //         },
-    //       ],
-    //     };
-    //     const findOneUserStub = sinon.stub(User, 'findOne').returns(mockDbUser);
-    //     const result = await User.findOne.restore();
-    //   });
-    //   xit('should return 500 when database fails', async () => {
-    //     const findOneUserStub = sinon
-    //       .stub(User, 'findOne')
-    //       .throws(new Error('Database fails'));
-    //     const res = await chai.request(app).post(apiURL).send();
-    //     expect(res.status).to.be.equal(500);
-    //     expect(res.body).to.have.property('error');
-    //     expect(res.body.error).to.have.property('statusCode');
-    //     expect(res.body.error).to.have.property('message');
-    //     expect(res.body.error.message).to.be.equal('Database fails');
-    //     User.findOne.restore();
-    //   });
+  describe('signin()', () => {
+    const mockUserFromDB = {
+      _id: '5f5e5d1283f636ac2b6eeb32',
+      ...mockUser,
+      roles: mockRoles,
+    };
+    const mockBody = { username: 'Misty', password: 'pa$$w0rd' };
+
+    let UserMock;
+    let next;
+    let bcryptStub;
+
+    beforeEach(() => {
+      UserMock = sinon.mock(User);
+      bcryptStub = sinon.stub(bcrypt, 'compare').callsFake(() => true);
+      next = sinon.stub().callsFake(() => true);
+    });
+
+    afterEach(() => {
+      bcrypt.compare.restore();
+      UserMock.restore();
+    });
+
+    it('should return 404 when passed user does not found', async () => {
+      const req = httpMocks.createRequest();
+      const res = httpMocks.createResponse();
+
+      UserMock.expects('findOne')
+        .withArgs({ username: req.body.username })
+        .chain('populate', 'roles', '-__v')
+        .resolves();
+
+      await controller.signIn(req, res, next);
+
+      expect(res.statusCode).to.be.equal(404);
+    });
+
+    it('should return 401 when give password is invalid', async () => {
+      const req = httpMocks.createRequest({
+        body: mockBody,
+      });
+      const res = httpMocks.createResponse();
+
+      bcryptStub.callsFake(() => false);
+
+      UserMock.expects('findOne')
+        .withArgs({ username: req.body.username })
+        .chain('populate', 'roles', '-__v')
+        .resolves(mockUserFromDB);
+
+      await controller.signIn(req, res, next);
+
+      expect(res.statusCode).to.be.equal(401);
+    });
+
+    it('should return 500 when database fails', async () => {
+      const req = httpMocks.createRequest({ body: mockBody });
+      const res = httpMocks.createResponse();
+
+      UserMock.expects('findOne')
+        .withArgs({ username: req.body.username })
+        .chain('populate', 'roles', '-__v')
+        .rejects(new Error('Database fails'));
+
+      await controller.signIn(req, res, next);
+
+      expect(next.calledOnce).to.be.equal(true);
+      expect(next.args[0][0]).to.be.instanceOf(Error);
+      expect(next.args[0][0]).to.have.property('message');
+      expect(next.args[0][0]).to.have.property('status');
+      expect(next.args[0][0].message).to.be.equal('Database fails');
+      expect(next.args[0][0].status).to.be.equal(500);
+    });
+
+    it('should return user data with accessToken when given username and password are valid', async () => {
+      const req = httpMocks.createRequest({ body: mockBody });
+      const res = httpMocks.createResponse();
+
+      UserMock.expects('findOne')
+        .withArgs({ username: req.body.username })
+        .chain('populate', 'roles', '-__v')
+        .resolves(mockUserFromDB);
+
+      sinon.stub(jwt, 'sign').callsFake((...args) => {
+        expect(args[0].id).to.be.equal(mockUserFromDB._id);
+
+        return 'access_token';
+      });
+
+      await controller.signIn(req, res, next);
+
+      const resBody = res._getData();
+
+      expect(res.statusCode).to.be.equal(200);
+      expect(resBody).to.have.property('id');
+      expect(resBody).to.have.property('username');
+      expect(resBody).to.have.property('email');
+      expect(resBody).to.have.property('accessToken');
+      expect(resBody).to.have.property('roles');
+      expect(resBody.roles.every(role => role.includes('ROLE_'))).to.be.equal(
+        true
+      );
+
+      jwt.sign.restore();
+    });
   });
 });

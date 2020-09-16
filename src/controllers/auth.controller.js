@@ -72,7 +72,7 @@ exports.signIn = async (req, res, next) => {
       return;
     }
 
-    const token = jwt.sign({ id: user.id }, authConfig.secret, {
+    const token = jwt.sign({ id: user._id }, authConfig.secret, {
       expiresIn: authConfig.expiresIn,
     });
 
@@ -94,6 +94,7 @@ exports.signIn = async (req, res, next) => {
       `${auth.SIGNIN_CONTROLLER}: ${auth.SIGNIN_FAILURE}`
     );
 
-    responseWithError(500, err.message)(res);
+    err.status = 500;
+    next(err);
   }
 };
