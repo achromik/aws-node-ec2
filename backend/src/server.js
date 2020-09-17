@@ -1,10 +1,17 @@
 const mongoose = require('mongoose');
+
 const app = require('./app');
 const AppLogger = require('./config/logger');
 const { connectDB } = require('./config/db');
 const seedRoles = require('./config/seedRoles');
 const { userRole } = require('./config/constants');
 const { port } = require('./config/app.config');
+
+const terminateSignals = {
+  SIGHUP: 1,
+  SIGINT: 2,
+  SIGTERM: 15,
+};
 
 let server;
 
@@ -27,17 +34,19 @@ async function start() {
 
 start();
 
-process.on('SIGTERM', () => {
-  AppLogger.log.info('SIGTERM signal received.');
+Object.keys(terminateSignals).forEach(signal => {
+  process.on(signal, () => {
+    AppLogger.log.info(`${signal} signal received.`);
 
-  AppLogger.log.info('Closing http server...');
-  server.close(() => {
-    AppLogger.log.info('Http server closed.');
+    AppLogger.log.info('Closing http server...');
+    server.close(() => {
+      AppLogger.log.info('Http server closed.');
 
-    mongoose.connection.close(false, () => {
-      AppLogger.log.info('MongoDb connection closed.');
+      mongoose.connection.close(false, () => {
+        AppLogger.log.info('MongoDb connection closed.');
 
-      process.exit(0);
+        process.exit(0);
+      });
     });
   });
 });

@@ -1,6 +1,6 @@
 FROM node:13-alpine
 
-RUN apk add --no-cache python make g++
+RUN apk add --no-cache python make g++ bash
 
 WORKDIR /usr/src/app
 
@@ -16,4 +16,4 @@ EXPOSE 3000
 
 RUN chmod 755 run.sh
 
-CMD ["./run.sh"]
+ENTRYPOINT [ "./run.sh" ]
