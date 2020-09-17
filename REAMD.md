@@ -4,9 +4,13 @@
 
 Build docker image and then run to verify it's working correctly:
 
+##### Backend
+
+In root project folder
+
 ```
-$ docker build . -t ec2-app
-$ docker run --env-file .env -p 3000:3000 ec2-app
+$ docker build ./backend -t ec2-app
+$ docker run --rm --name ec2-app --env-file .env -p 3000:3000 ec2-app
 ```
 
 #### Pushing Docker image to Docker Hub
