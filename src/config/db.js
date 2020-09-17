@@ -7,7 +7,8 @@ let dbInstance = null;
 
 exports.connectDB = async () => {
   if (process.env.NODE_ENV === 'test') {
-    const Mockgoose = require('mockgoose').Mockgoose;
+    // eslint-disable-next-line global-require
+    const { Mockgoose } = require('mockgoose');
     const mockgoose = new Mockgoose(mongoose);
     try {
       await mockgoose.prepareStorage();
@@ -16,7 +17,7 @@ exports.connectDB = async () => {
         useUnifiedTopology: true,
         useFindAndModify: false,
       });
-      return Promise.resolve(dbInstance);
+      return Promise.resolve(mockDBInstance);
     } catch (err) {
       return Promise.reject(err);
     }

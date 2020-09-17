@@ -1,12 +1,13 @@
 const express = require('express');
-const app = express();
 const addRequestId = require('express-request-id')();
 
+const { common } = require('./config/constants');
 const AppLogger = require('./config/logger');
+const { baseApiPath } = require('./config/app.config');
+const authRoutes = require('./routes/auth.routes');
+const userRoutes = require('./routes/user.routes');
 
-const db = require('./models');
-const User = db.user;
-
+const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(addRequestId);
@@ -27,7 +28,7 @@ app.use((req, res, next) => {
       },
       true
     );
-    log.info({ res }, 'response');
+    log.info({ res }, common.RESPONSE);
   };
 
   res.on('finish', afterResponse);
@@ -40,34 +41,29 @@ app.get('/', (req, res, next) => {
   res.json({ message: 'Welcome' });
 });
 
-app.post('/user', async (req, res, next) => {
-  const body = req.body;
-  try {
-    const user = new User(body);
-    const result = await user.save({ body });
-    res.send({ data: result });
-  } catch (err) {
-    AppLogger.log.error({ err }, 'Saving user failed');
-    res.status(400).send(err);
-  }
-});
+authRoutes(app, baseApiPath);
+userRoutes(app);
 
 app.use((req, res, next) => {
-  const response = { status: 404, error: 'Not found' };
-  AppLogger.log.warn({ id: req.id, path: req.path }, 'Not Found');
+  const response = { statusCode: 404, message: common.NOT_FOUND };
+  AppLogger.log.warn({ id: req.id, path: req.path }, common.NOT_FOUND);
 
-  res.status(404).send(response);
+  res.status(404).send({ error: response });
 });
 
 app.use((error, req, res, next) => {
-  AppLogger.log.error({ err: error, req });
+  AppLogger.log.error(
+    { id: req.id, path: req.path, message: error.message },
+    `Error occurred: ${req.path}`
+  );
 
   res.status(error.status || 500).send({
     error: {
       status: error.status || 500,
-      message: error.message || 'Internal Server Error',
+      message: error.message || common.INTERNAL_SERVER_ERROR,
     },
   });
+
   next();
 });
 

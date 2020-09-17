@@ -2,8 +2,19 @@
   "prettier.singleQuote": true,
   "editor.formatOnSave": true,
   "standard.enable": false,
-  "cSpell.words": ["Mockgoose"],
+  "cSpell.words": [
+    "Mockgoose",
+    "Serialzer",
+    "Signin",
+    "serializers",
+    "xdescribe"
+  ],
   "mochaExplorer.env": {
     "NODE_ENV": "test"
-  }
+},
+"editor.tabSize": 2,
+"rest-client.fontSize": 11,
+"rest-client.requestNameAsResponseTabTitle": true,
+"rest-client.previewResponsePanelTakeFocus": false,
+"prettier.arrowParens": "avoid"
 }

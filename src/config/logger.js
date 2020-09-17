@@ -1,10 +1,13 @@
 const bunyan = require('bunyan');
+const reqSerialzer = require('bunyan-express-serializer');
+
+const { common } = require('./constants');
 
 const log = bunyan.createLogger({
   name: 'ec2-app',
   serializers: {
     err: bunyan.stdSerializers.err,
-    req: require('bunyan-express-serializer'),
+    req: reqSerialzer,
     res: bunyan.stdSerializers.res,
   },
 });
@@ -13,20 +16,20 @@ if (process.env.NODE_ENV === 'test') {
   log.level(bunyan.FATAL + 1);
 }
 
-const logResponse = function (id, body, statusCode) {
-  const log = this.log.child(
+function logResponse(id, body, statusCode) {
+  const logger = this.log.child(
     {
-      id: id,
-      statusCode: statusCode,
-      body: body,
+      id,
+      statusCode,
+      body,
     },
     true
   );
-  log.info('response');
-};
+  logger.info(common.RESPONSE);
+}
 
-const logRequest = function (req) {
-  const log = this.log.child(
+function logRequest(req) {
+  const logger = this.log.child(
     {
       id: req.id,
       method: req.method,
@@ -36,7 +39,7 @@ const logRequest = function (req) {
     },
     true
   );
-  log.info('request');
-};
+  logger.info(common.REQUEST);
+}
 
 module.exports = { log, logRequest, logResponse };
