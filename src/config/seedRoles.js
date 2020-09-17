@@ -1,44 +1,32 @@
 const db = require('../models');
-const { userRole } = require('./constants');
 const AppLogger = require('./logger');
 
 const Role = db.role;
 
-const logRoleSaveResult = (role, err) => {
-  if (err) {
-    AppLogger.log.error({ err }, `Initial: add '${role}' role error`);
+const saveRole = async roleName => {
+  try {
+    const role = new Role({ name: roleName });
+    await role.save();
+    AppLogger.log.warn(`Initial: added '${roleName}' to roles collection`);
+  } catch (err) {
+    AppLogger.log.error({ err }, `Initial: add '${roleName}' role error`);
   }
-
-  AppLogger.log.warn(`Initial: added '${role}' to roles collection`);
 };
 
-const seedRoles = () => {
-  Role.estimatedDocumentCount((err, count) => {
-    if (!err && count === 0) {
-      new Role({
-        name: userRole.USER,
-      }).save(e => {
-        logRoleSaveResult(userRole.USER, e);
-      });
+const seedRoles = async roles => {
+  try {
+    const count = await Role.estimatedDocumentCount({});
 
-      new Role({
-        name: userRole.MODERATOR,
-      }).save(e => {
-        logRoleSaveResult(userRole.MODERATOR, e);
+    if (!count) {
+      await roles.map(async role => {
+        await saveRole(role);
       });
-
-      new Role({
-        name: userRole.ADMIN,
-      }).save(e => {
-        logRoleSaveResult(userRole.ADMIN, e);
-      });
-    } else {
-      if (err) {
-        AppLogger.log.error({ err }, 'Initial: add roles error');
-      }
-      AppLogger.log.info('Initial: Roles exists');
     }
-  });
+
+    AppLogger.log.info('Initial: Roles exists');
+  } catch (err) {
+    AppLogger.log.error({ err }, 'Initial: add roles error');
+  }
 };
 
 module.exports = seedRoles;
