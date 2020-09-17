@@ -12,18 +12,16 @@ const signup = async (req, res, next) => {
   try {
     const value = await validateRequest.body(req, signupSchema);
     req.body = value;
+
     next();
+    return true;
   } catch (err) {
     const message = prepareMessage(err.details);
 
     AppLogger.log.warn({ err }, auth.SIGNUP_VALIDATOR);
 
-    res.status(400).send({
-      error: {
-        statusCode: 400,
-        message,
-      },
-    });
+    next(new Error(message));
+    return false;
   }
 };
 
