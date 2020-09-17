@@ -42,7 +42,7 @@ app.get('/', (req, res, next) => {
 });
 
 authRoutes(app, baseApiPath);
-userRoutes(app);
+userRoutes(app, baseApiPath);
 
 app.use((req, res, next) => {
   const response = { statusCode: 404, message: common.NOT_FOUND };
