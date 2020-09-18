@@ -1,8 +1,11 @@
 {
-  "name": "ec2",
+  "name": "ec2-backend",
   "version": "1.0.3",
   "description": "",
   "main": "server.js",
+  "engines": {
+    "node": "14.11.0"
+  },
   "scripts": {
     "test": "NODE_ENV=test nyc --reporter=text --reporter=lcov --all mocha -c --exit test/**/*.test.js",
     "start": "node src/server.js | bunyan -o short",
