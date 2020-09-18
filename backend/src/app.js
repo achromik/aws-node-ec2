@@ -1,5 +1,6 @@
 const express = require('express');
 const addRequestId = require('express-request-id')();
+const cors = require('cors');
 
 const { common } = require('./config/constants');
 const AppLogger = require('./config/logger');
@@ -8,6 +9,13 @@ const authRoutes = require('./routes/auth.routes');
 const userRoutes = require('./routes/user.routes');
 
 const app = express();
+
+const corsOptions = {
+  origin: '*',
+};
+
+app.use(cors(corsOptions));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(addRequestId);
