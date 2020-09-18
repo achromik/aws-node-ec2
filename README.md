@@ -4,6 +4,14 @@
 
 Use Makefile commands to start, test, and build images
 
+#### Node
+
+In root project folder:
+
+```
+nvm use
+```
+
 #### Backend
 
 To run locally:
