@@ -4,17 +4,24 @@ import { authHeader } from './auth-header';
 import { config } from '../config/app.config';
 
 export const getPublicContent = () => {
-  return axios.get(`${config.API_URL}/all`);
+  return axios.get(`${config.API_URL}/test/all`);
 };
 
 export const getUserBoard = () => {
-  return axios.get(`${config.API_URL}/user`, { headers: authHeader() });
+  return axios.get(`${config.API_URL}/test/user`, { headers: authHeader() });
 };
 
 export const getModeratorBoard = () => {
-  return axios.get(`${config.API_URL}/mod`, { headers: authHeader() });
+  return axios.get(`${config.API_URL}/test/mod`, { headers: authHeader() });
 };
 
 export const getAdminBoard = () => {
-  return axios.get(`${config.API_URL}/admin`, { headers: authHeader() });
+  return axios.get(`${config.API_URL}/test/admin`, { headers: authHeader() });
+};
+
+export const UserService = {
+  getPublicContent,
+  getUserBoard,
+  getModeratorBoard,
+  getAdminBoard,
 };
