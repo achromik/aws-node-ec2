@@ -12,6 +12,8 @@ services:
     networks:
       - frontend
       - backend
+    volumes:
+      - ./ssl:/etc/nginx/certs
 
   backend:
     image: nginx-backend
