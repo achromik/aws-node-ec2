@@ -1,0 +1,35 @@
+version: "3.8"
+
+services:
+  frontend:
+    image: frontend
+    build:
+      context: ./frontend
+      dockerfile: ./Dockerfile.dev
+
+    ports:
+      - 8080:8080
+    networks:
+      - frontend
+      - backend
+    volumes:
+      - ./frontend:/usr/src/app
+      - /usr/src/app/node_modules
+    env_file:
+      - ./.env.dev
+    stdin_open: true
+
+  backend:
+    image: backend
+    ports:
+      - 3000:3000
+    build:
+      context: ./backend
+    env_file:
+      - ./.env.dev
+    networks:
+      - backend
+
+networks:
+  frontend:
+  backend:

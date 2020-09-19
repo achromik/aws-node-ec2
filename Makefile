@@ -1,59 +1,18 @@
-.PHONY: build-backend run-backend push-image dev-backend
+.PHONY:
 
-include .env
-export $(shell sed 's/=.*//' .env)
+build-dev: build-dev-frontend build-dev-backend
 
-ENV_FILE_PARAM = --env-file .env
-NVM := $(shell test -f "$$HOME/.nvm/nvm.sh"; echo $$?)
+run-dev: build-dev
+	docker-compose -f docker-compose.dev.yml up
 
-BE_TAG := $(shell echo $$(node -p "require('./backend/package.json').version"))
+build-dev-frontend:
+	docker-compose -f docker-compose.dev.yml build frontend
 
-build-backend:
-	docker build ./backend -t $(NAME)-backend
+build-dev-backend:
+	docker-compose -f docker-compose.dev.yml build backend
 
-build-frontend:
-	docker build ./frontend -t $(NAME)-frontend
-
-build-frontend-prod:
-	docker build \
-	-f frontend/Dockerfile.prod \
-	-t $(NAME)-frontend \
-	./frontend
-
-run-backend:
-	docker run -d --rm --name app-backend $(ENV_FILE_PARAM) -p $(API_PORT):$(API_PORT) $(NAME)-backend
-
-run-dev-frontend:
-	docker run \
-	-it \
-	--rm \
-	-v ${PWD}/frontend:/usr/src/app \
-	-v /usr/src/app/node_modules \
-	-p $(PORT):$(PORT) \
-	-e CHOKIDAR_USEPOLLING=true \
-	--name app-frontend \
-	$(ENV_FILE_PARAM) \
-	$(NAME)-frontend
-
-push-image: build-backend
-	docker login
-	docker tag ${NAME}-backend $(DOCKER_HUB_USER)/$(NAME)-backend:$(BE_TAG)
-	docker push $(DOCKER_HUB_USER)/$(NAME)-backend:$(BE_TAG)
-
-dev-backend:
-	cd backend && \
-	node_modules/.bin/nodemon \
-	--ignore './test/' \
-	-r dotenv/config \
-	src/server.js \
-	dotenv_config_path=../.env |\
-	| node_modules/.bin/bunyan -o short
-
-dev-frontend:
-	cd frontend && \
-	node_modules/.bin/react-scripts start
-
-run-dev: run-backend dev-frontend
+run-dev-backend:
+	docker-compose -f docker-compose.dev.yml up backend
 
 backend-install:
 	cd backend && \
@@ -65,5 +24,13 @@ frontend-install:
 
 install: backend-install frontend-install
 
+build-prod: build-prod-frontend build-prod-backend
 
+run-prod: build-prod
+	docker-compose up -d
 
+build-prod-frontend:
+	docker-compose build frontend
+
+build-prod-backend:
+	docker-compose build backend
