@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 
 import { FormError } from '../common/FormError';
 import { AuthService } from '../services/auth.service';
+import { getMessageFromError } from '../helpers/getMessageFromError';
 
 export const Register = () => {
   const [message, setMessage] = useState('');
@@ -40,10 +41,7 @@ export const Register = () => {
         setSuccessful(true);
         formik.setSubmitting(false);
       } catch (error) {
-        const resMessage =
-          error.response?.data?.error?.message ||
-          error.message ||
-          error.toString();
+        const resMessage = getMessageFromError(error);
 
         setMessage(resMessage);
         formik.setSubmitting(false);

@@ -4,6 +4,7 @@ import * as Yup from 'yup';
 
 import { AuthService } from '../services/auth.service';
 import { FormError } from '../common/FormError';
+import { getMessageFromError } from '../helpers/getMessageFromError';
 
 export const Login = props => {
   const [message, setMessage] = useState('');
@@ -26,10 +27,7 @@ export const Login = props => {
         props.history.push('/profile');
         window.location.reload();
       } catch (error) {
-        const resMessage =
-          error.response?.data?.error?.message ||
-          error.message ||
-          error.toString();
+        const resMessage = getMessageFromError(error);
 
         setMessage(resMessage);
         formik.setSubmitting(false);
