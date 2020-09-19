@@ -11,7 +11,7 @@ build-backend:
 	docker build ./backend -t $(NAME)-backend
 
 run-backend:
-	docker run --rm --name app-backend $(ENV_FILE_PARAM) -p $(PORT):$(PORT) $(NAME)-backend
+	docker run -d --rm --name app-backend $(ENV_FILE_PARAM) -p $(PORT):$(PORT) $(NAME)-backend
 
 push-image: build-backend
 	docker login
