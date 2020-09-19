@@ -2,6 +2,10 @@ FROM node:14-alpine
 
 WORKDIR /usr/src/app
 
+# ARG REACT_APP_SERVICES_HOST
+
+# ENV REACT_APP_SERVICES_HOST $REACT_APP_SERVICES_HOST
+
 ENV PATH /usr/src/app/node_modules/.bin:$PATH
 
 COPY package*.json ./
