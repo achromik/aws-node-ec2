@@ -9,6 +9,7 @@ services:
         - REACT_APP_SERVICES_HOST=/api/v1
     ports:
       - "80:80"
+      - "443:443"
     networks:
       - frontend
       - backend
