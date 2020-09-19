@@ -3,7 +3,6 @@ export const authHeader = () => {
 
   if (user && user.accessToke) {
     return { 'x-access-token': user.accessToken };
-  } else {
-    return {};
   }
+  return {};
 };
