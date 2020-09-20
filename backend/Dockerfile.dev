@@ -1,0 +1,17 @@
+FROM node:14-alpine
+
+RUN apk add --no-cache python make g++ bash
+
+WORKDIR /usr/src/app
+
+# RUN npm install -g bunyan
+
+ENV PATH /usr/src/app/node_modules/.bin:$PATH
+
+COPY package*.json ./
+
+RUN npm install --silent
+
+COPY . .
+
+CMD ["npm", "run", "dev"]
