@@ -21,7 +21,7 @@ const middleware = {
   authJwt: {
     AUTH_JWT_MIDDLEWARE: 'Auth JWT middleware',
     ADMIN_ROLE_REQUIRED: 'Require Admin Role',
-    NO_TOKEN_PROVIDED: 'No Token provide',
+    NO_TOKEN_PROVIDED: 'No Token Provided',
     UNAUTHORIZED: 'Unauthorized',
   },
 };

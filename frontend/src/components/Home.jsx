@@ -12,9 +12,9 @@ export const Home = () => {
         const response = await UserService.getPublicContent();
         setContent(response.data);
       } catch (error) {
-        const _content = getMessageFromError(error);
+        const errContent = getMessageFromError(error);
 
-        setContent(_content);
+        setContent(errContent);
       }
     };
 

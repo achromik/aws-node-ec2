@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 
@@ -45,38 +46,43 @@ export const Login = props => {
         />
         <form onSubmit={formik.handleSubmit}>
           <div className="form-group">
-            <label htmlFor="username">Username</label>
-            <input
-              id="username"
-              type="text"
-              className="form-control"
-              {...formik.getFieldProps('username')}
-            />
-            {formik.touched.username && formik.errors.username && (
-              <FormError message={formik.errors.username} />
-            )}
+            <label htmlFor="username">
+              Username
+              <input
+                id="username"
+                type="text"
+                className="form-control"
+                {...formik.getFieldProps('username')}
+              />
+              {formik.touched.username && formik.errors.username && (
+                <FormError message={formik.errors.username} />
+              )}
+            </label>
           </div>
 
           <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <input
-              id="password"
-              type="password"
-              className="form-control"
-              {...formik.getFieldProps('password')}
-            />
-            {formik.touched.password && formik.errors.password && (
-              <FormError message={formik.errors.password} />
-            )}
+            <label htmlFor="password">
+              Password
+              <input
+                id="password"
+                type="password"
+                className="form-control"
+                {...formik.getFieldProps('password')}
+              />
+              {formik.touched.password && formik.errors.password && (
+                <FormError message={formik.errors.password} />
+              )}
+            </label>
           </div>
 
           <div className="form-group">
             <button
+              type="submit"
               className="btn btn-primary btn-block"
               disabled={formik.isSubmitting}
             >
               {formik.isSubmitting && (
-                <span className="spinner-border spinner-border-sm"></span>
+                <span className="spinner-border spinner-border-sm" />
               )}
               <span>Login</span>
             </button>
@@ -93,4 +99,10 @@ export const Login = props => {
       </div>
     </div>
   );
+};
+
+Login.propTypes = {
+  history: PropTypes.shape({
+    push: PropTypes.func.isRequired,
+  }).isRequired,
 };

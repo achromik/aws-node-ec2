@@ -34,10 +34,9 @@ export const Register = () => {
       setSuccessful(false);
       try {
         const res = await AuthService.register(username, email, password);
-        console.log();
 
-        const message = `User: ${res.data.username} was registered successfully`;
-        setMessage(message);
+        const successMessage = `User: ${res.data.username} was registered successfully`;
+        setMessage(successMessage);
         setSuccessful(true);
         formik.setSubmitting(false);
       } catch (error) {
@@ -61,47 +60,53 @@ export const Register = () => {
           {!successful && (
             <>
               <div className="form-group">
-                <label htmlFor="username">Username</label>
-                <input
-                  id="username"
-                  type="text"
-                  className="form-control"
-                  {...formik.getFieldProps('username')}
-                />
-                {formik.touched.username && formik.errors.username && (
-                  <FormError message={formik.errors.username} />
-                )}
+                <label htmlFor="username">
+                  Username
+                  <input
+                    id="username"
+                    type="text"
+                    className="form-control"
+                    {...formik.getFieldProps('username')}
+                  />
+                  {formik.touched.username && formik.errors.username && (
+                    <FormError message={formik.errors.username} />
+                  )}
+                </label>
               </div>
 
               <div className="form-group">
-                <label htmlFor="email">Email</label>
-                <input
-                  id="email"
-                  type="email"
-                  className="form-control"
-                  {...formik.getFieldProps('email')}
-                />
-                {formik.touched.email && formik.errors.email && (
-                  <FormError message={formik.errors.email} />
-                )}
+                <label htmlFor="email">
+                  Email
+                  <input
+                    id="email"
+                    type="email"
+                    className="form-control"
+                    {...formik.getFieldProps('email')}
+                  />
+                  {formik.touched.email && formik.errors.email && (
+                    <FormError message={formik.errors.email} />
+                  )}
+                </label>
               </div>
 
               <div className="form-group">
-                <label htmlFor="password">Password</label>
-                <input
-                  id="password"
-                  type="password"
-                  className="form-control"
-                  {...formik.getFieldProps('password')}
-                />
-                {formik.touched.password && formik.errors.password && (
-                  <FormError message={formik.errors.password} />
-                )}
+                <label htmlFor="password">
+                  Password
+                  <input
+                    id="password"
+                    type="password"
+                    className="form-control"
+                    {...formik.getFieldProps('password')}
+                  />
+                  {formik.touched.password && formik.errors.password && (
+                    <FormError message={formik.errors.password} />
+                  )}
+                </label>
               </div>
               <div className="form-">
                 <button className="btn btn-primary btn-block" type="submit">
                   {formik.isSubmitting && (
-                    <span className="spinner-border spinner-border-sm"></span>
+                    <span className="spinner-border spinner-border-sm" />
                   )}
                   <span>Sign up</span>
                 </button>
@@ -122,10 +127,10 @@ export const Register = () => {
               {successful && (
                 <div className="justify-content-center">
                   <Link
-                    to={'/login'}
+                    to="/login"
                     className="stretched-link text-center d-block"
                   >
-                    <span class="card-link">Sign in</span>
+                    <span className="card-link">Sign in</span>
                   </Link>
                 </div>
               )}
