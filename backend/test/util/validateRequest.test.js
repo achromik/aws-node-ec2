@@ -2,7 +2,7 @@ const { expect } = require('chai');
 const httpMocks = require('node-mocks-http');
 const Joi = require('joi');
 
-const validateRequest = require('../../src/util/validateRequest');
+const { validateRequest } = require('../../src/util/validateRequest');
 
 const schema = Joi.object({
   text: Joi.string().min(3).required(),
@@ -18,7 +18,7 @@ describe('validateRequest', () => {
 
     const req = httpMocks.createRequest({ body: payload });
 
-    const value = await validateRequest.body(req, schema);
+    const value = await validateRequest(req.body, schema);
 
     expect(value).to.be.deep.equal(payload);
   });
@@ -32,7 +32,7 @@ describe('validateRequest', () => {
 
     const req = httpMocks.createRequest({ body: payload });
 
-    const value = await validateRequest.body(req, schema);
+    const value = await validateRequest(req.body, schema);
 
     expect(value).to.have.property('text');
     expect(value.text).to.be.equal(payload.text);
@@ -51,7 +51,7 @@ describe('validateRequest', () => {
     const req = httpMocks.createRequest({ body: payload });
 
     try {
-      await validateRequest.body(req, schema);
+      await validateRequest(req.body, schema);
     } catch (error) {
       expect(error).to.be.instanceOf(Error);
       expect(error.message).to.contain('number');
