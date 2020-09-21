@@ -6,10 +6,8 @@ const chaiHttp = require('chai-http');
 const conn = require('../../src/config/db');
 const authRoutes = require('../../src/routes/auth.routes');
 const controller = require('../../src/controllers/auth.controller');
-const { verifySignUp } = require('../../src/middlewares');
-const { authValidator } = require('../../src/validators');
+const { verifySignUp, validateRequest } = require('../../src/middlewares');
 
-let app;
 let sandbox;
 
 chai.use(chaiHttp);
@@ -17,14 +15,14 @@ chai.use(chaiHttp);
 describe('API auth routes', () => {
   describe('POST /auth/signup', () => {
     const apiURL = '/auth/signup';
+
     let checkRoleExistedStub;
     let checkDuplicateUsernameOrEmailStub;
-    let signupPayloadValidationStub;
     let signUpStub;
 
     const payload = {
       username: 'Foo Bar',
-      email: 'iro@fo.tp',
+      email: 'iro@asd',
       password: 'foobar',
       roles: ['admin'],
     };
@@ -43,12 +41,6 @@ describe('API auth routes', () => {
 
       sandbox = sinon.createSandbox();
 
-      signupPayloadValidationStub = sandbox
-        .stub(authValidator, 'signup')
-        .callsFake((req, res, next) => {
-          next();
-        });
-
       checkDuplicateUsernameOrEmailStub = sandbox
         .stub(verifySignUp, 'checkDuplicateUsernameOrEmail')
         .callsFake((req, res, next) => {
@@ -66,17 +58,12 @@ describe('API auth routes', () => {
         .callsFake((req, res, next) => {
           res.status(200).send({ text: 'test' });
         });
-
-      // eslint-disable-next-line global-require
-      app = require('../../src/app');
-
-      authRoutes(app);
     });
 
     afterEach(async () => {
       verifySignUp.checkDuplicateUsernameOrEmail.restore();
       verifySignUp.checkRoleExisted.restore();
-      authValidator.signup.restore();
+      validateRequest.validateBody.restore();
 
       controller.signUp.restore();
 
@@ -93,25 +80,28 @@ describe('API auth routes', () => {
     });
 
     it('should not call signup controller when payload validation fails', async () => {
-      signupPayloadValidationStub.callsFake((req, res, next) => {
-        res.status(400).send({
-          error: {
-            statusCode: 400,
-            message: 'Failed request payload validation',
-          },
+      sandbox
+        .stub(validateRequest, 'validateBody')
+        .callsFake(() => (req, res, next) => {
+          const error = new Error('Failed request payload validation');
+          error.statusCode = 400;
+          next(error);
         });
-      });
+
+      // eslint-disable-next-line global-require
+      const app = require('../../src/app');
+
+      authRoutes(app);
 
       const res = await chai.request(app).post(apiURL).send(payload);
 
       expect(signUpStub.notCalled).to.be.equal(true);
-
       expect(res.status).to.be.equal(400);
       expect(res.body).to.have.property('error');
       expect(res.body.error).to.have.property('statusCode');
       expect(res.body.error).to.have.property('message');
       expect(res.body.error.message).to.be.contain(
-        'Failed request payload validation'
+        'Failed request payload validation',
       );
     });
 
@@ -125,6 +115,17 @@ describe('API auth routes', () => {
         });
       });
 
+      sandbox
+        .stub(validateRequest, 'validateBody')
+        .callsFake(() => (req, res, next) => {
+          next();
+        });
+
+      // eslint-disable-next-line global-require
+      const app = require('../../src/app');
+
+      authRoutes(app);
+
       const res = await chai.request(app).post(apiURL).send(payload);
 
       expect(signUpStub.notCalled).to.be.equal(true);
@@ -134,7 +135,7 @@ describe('API auth routes', () => {
       expect(res.body.error).to.have.property('statusCode');
       expect(res.body.error).to.have.property('message');
       expect(res.body.error.message).to.be.contain(
-        'Username or email already exists'
+        'Username or email already exists',
       );
     });
 
@@ -148,6 +149,17 @@ describe('API auth routes', () => {
         });
       });
 
+      sandbox
+        .stub(validateRequest, 'validateBody')
+        .callsFake(() => (req, res, next) => {
+          next();
+        });
+
+      // eslint-disable-next-line global-require
+      const app = require('../../src/app');
+
+      authRoutes(app);
+
       const res = await chai.request(app).post(apiURL).send(payload);
 
       expect(signUpStub.notCalled).to.be.equal(true);
@@ -160,6 +172,16 @@ describe('API auth routes', () => {
     });
 
     it('should call signup controller when middleware functions all passed', async () => {
+      sandbox
+        .stub(validateRequest, 'validateBody')
+        .callsFake(() => (req, res, next) => {
+          next();
+        });
+
+      // eslint-disable-next-line global-require
+      const app = require('../../src/app');
+
+      authRoutes(app);
       const res = await chai.request(app).post(apiURL).send(payload);
 
       expect(signUpStub.calledOnce).to.be.equal(true);
@@ -169,22 +191,33 @@ describe('API auth routes', () => {
     });
 
     it('should call middlewares in specific order', async () => {
+      const validateRequestBodyStub = sandbox
+        .stub(validateRequest, 'validateBody')
+        .callsFake(() => (req, res, next) => {
+          next();
+        });
+
+      // eslint-disable-next-line global-require
+      const app = require('../../src/app');
+
+      authRoutes(app);
       await chai.request(app).post(apiURL).send(payload);
 
       expect(signUpStub.calledOnce).to.be.equal(true);
 
       await sinon.assert.callOrder(
-        signupPayloadValidationStub,
+        validateRequestBodyStub,
         checkDuplicateUsernameOrEmailStub,
-        checkRoleExistedStub
+        checkRoleExistedStub,
       );
     });
   });
 
   describe('POST /auth/signin', () => {
     const apiURL = '/auth/signin';
+
+    let app;
     let signInStub;
-    let signinPayloadValidationStub;
 
     const payload = {
       username: 'Foo Bar',
@@ -214,17 +247,6 @@ describe('API auth routes', () => {
         .callsFake((req, res, next) => {
           res.status(200).send({ text: 'test' });
         });
-
-      signinPayloadValidationStub = sandbox
-        .stub(authValidator, 'signin')
-        .callsFake((res, req, next) => {
-          next();
-        });
-
-      // eslint-disable-next-line global-require
-      app = require('../../src/app');
-
-      authRoutes(app);
     });
 
     after(async () => {
@@ -233,28 +255,51 @@ describe('API auth routes', () => {
       await conn.close();
     });
 
-    afterEach(done => {
+    afterEach(async () => {
       controller.signIn.restore();
+      validateRequest.validateBody.restore();
 
       sandbox.restore();
-      done();
     });
 
     it('should return 400 when payload validation fails', async () => {
-      signinPayloadValidationStub.callsFake((res, req, next) => {
-        const error = new Error('Validation fails');
-        error.status = 400;
-        next(error);
-      });
+      sandbox
+        .stub(validateRequest, 'validateBody')
+        .callsFake(() => (req, res, next) => {
+          const error = new Error('Failed request payload validation');
+          error.statusCode = 400;
+          next(error);
+        });
+
+      // eslint-disable-next-line global-require
+      app = require('../../src/app');
+
+      authRoutes(app);
 
       const res = await chai.request(app).post(apiURL).send();
 
       expect(signInStub.notCalled).to.be.equal(true);
       expect(res.status).to.be.equal(400);
-      expect(res.body.error.message).to.be.equal('Validation fails');
+      expect(res.body).to.have.property('error');
+      expect(res.body.error).to.have.property('statusCode');
+      expect(res.body.error).to.have.property('message');
+      expect(res.body.error.message).to.be.contain(
+        'Failed request payload validation',
+      );
     });
 
     it('should call signin controller when middleware validation passed', async () => {
+      sandbox
+        .stub(validateRequest, 'validateBody')
+        .callsFake(() => (req, res, next) => {
+          next();
+        });
+
+      // eslint-disable-next-line global-require
+      app = require('../../src/app');
+
+      authRoutes(app);
+
       const res = await chai.request(app).post(apiURL).send(payload);
 
       expect(signInStub.calledOnce).to.be.equal(true);

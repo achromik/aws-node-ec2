@@ -27,20 +27,25 @@ exports.verifyToken = (req, res, next) => {
   });
 };
 
-const hasRole = roleName => async (req, res, next) => {
+const hasRole = (...args) => async (req, res, next) => {
   try {
+    const rolesName = args.flat();
+
     const user = await User.findById(req.userId);
 
     const roles = await Role.find({ _id: { $in: user.roles } });
 
-    const hasUserRole = roles.some(role => role.name === roleName);
+    const hasUserRole = roles.some(role => rolesName.includes(role.name));
 
     if (hasUserRole) {
       next();
       return true;
     }
 
-    responseWithError(403, `${common.REQUIRED_ROLE}: ${roleName}`)(res);
+    responseWithError(
+      403,
+      `${common.REQUIRED_ROLE}: ${rolesName.join(', ')}`,
+    )(res);
     return false;
   } catch (err) {
     AppLogger.log.error({ err }, middleware.authJwt.AUTH_JWT_MIDDLEWARE);

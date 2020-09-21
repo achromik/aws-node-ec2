@@ -66,7 +66,7 @@ describe('authJwt', () => {
       expect(resSpy.calledOnce).to.be.equal(true);
       expect(next.notCalled).to.be.equal(true);
       expect(res._getData().error.message).to.be.equal(
-        middleware.authJwt.NO_TOKEN_PROVIDED
+        middleware.authJwt.NO_TOKEN_PROVIDED,
       );
     });
 
@@ -144,7 +144,7 @@ describe('authJwt', () => {
       expect(findRoleStub.calledOnce).to.be.equal(true);
     });
 
-    it('should response with 503 when user does not have admin role', async () => {
+    it('should response with 403 when user does not have admin role', async () => {
       const findByIdUserStub = sinon.stub(User, 'findById').returns(mockUser);
 
       const findRoleStub = sinon.stub(Role, 'find').returns(mockUserRoles);
@@ -161,7 +161,7 @@ describe('authJwt', () => {
       expect(resSpy.calledOnce).to.be.equal(true);
       expect(next.notCalled).to.be.equal(true);
       expect(res._getData().error.message).to.be.equal(
-        `${common.REQUIRED_ROLE}: ${userRole.ADMIN}`
+        `${common.REQUIRED_ROLE}: ${userRole.ADMIN}`,
       );
       expect(findByIdUserStub.calledOnce).to.be.equal(true);
       expect(findByIdUserStub.args[0][0]).to.be.equal(userId);
@@ -201,7 +201,7 @@ describe('authJwt', () => {
       User.findById.restore();
     });
 
-    it('should response with 503 when user does not have admin role', async () => {
+    it('should response with 403 when user does not have admin role', async () => {
       const findByIdUserStub = sinon.stub(User, 'findById').returns(mockUser);
 
       const findRoleStub = sinon.stub(Role, 'find').returns(mockUserRoles);
@@ -218,7 +218,7 @@ describe('authJwt', () => {
       expect(resSpy.calledOnce).to.be.equal(true);
       expect(next.notCalled).to.be.equal(true);
       expect(res._getData().error.message).to.be.equal(
-        `${common.REQUIRED_ROLE}: ${userRole.ADMIN}`
+        `${common.REQUIRED_ROLE}: ${userRole.ADMIN}`,
       );
       expect(findByIdUserStub.calledOnce).to.be.equal(true);
       expect(findByIdUserStub.args[0][0]).to.be.equal(userId);
@@ -258,7 +258,7 @@ describe('authJwt', () => {
       User.findById.restore();
     });
 
-    it('should response with 503 when user does not have moderator role', async () => {
+    it('should response with 403 when user does not have moderator role', async () => {
       const findByIdUserStub = sinon.stub(User, 'findById').returns(mockUser);
 
       const findRoleStub = sinon.stub(Role, 'find').returns(mockUserRoles);
@@ -275,7 +275,7 @@ describe('authJwt', () => {
       expect(resSpy.calledOnce).to.be.equal(true);
       expect(next.notCalled).to.be.equal(true);
       expect(res._getData().error.message).to.be.equal(
-        `${common.REQUIRED_ROLE}: ${userRole.MODERATOR}`
+        `${common.REQUIRED_ROLE}: ${userRole.MODERATOR}`,
       );
       expect(findByIdUserStub.calledOnce).to.be.equal(true);
       expect(findByIdUserStub.args[0][0]).to.be.equal(userId);
