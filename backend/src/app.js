@@ -34,7 +34,7 @@ app.use((req, res, next) => {
       {
         id: req.id,
       },
-      true
+      true,
     );
     log.info({ res }, common.RESPONSE);
   };
@@ -62,12 +62,12 @@ app.use((req, res, next) => {
 app.use((error, req, res, next) => {
   AppLogger.log.error(
     { id: req.id, path: req.path, message: error.message },
-    `Error occurred: ${req.path}`
+    `Error occurred: ${req.path}`,
   );
 
-  res.status(error.status || 500).send({
+  res.status(error.status || error.statusCode || 500).send({
     error: {
-      status: error.status || 500,
+      statusCode: error.status || error.statusCode || 500,
       message: error.message || common.INTERNAL_SERVER_ERROR,
     },
   });
