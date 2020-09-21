@@ -28,7 +28,6 @@ describe('API auth routes', () => {
     };
 
     const clearCachedModules = () => {
-      delete require.cache[require.resolve('../../src/validators')];
       delete require.cache[require.resolve('../../src/middlewares')];
       delete require.cache[require.resolve('../../src/app')];
       delete require.cache[
